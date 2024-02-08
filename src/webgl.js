@@ -62,7 +62,7 @@ export function loadTexture(gl, url) {
       const texture = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip it on vertex shader
       gl.texImage2D(
         gl.TEXTURE_2D,
         level,
