@@ -1,8 +1,8 @@
-export function createContext() {
+export function createContext(width, height) {
   const canvas = document.createElement('canvas');
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
 
   document.body.appendChild(canvas);
 

@@ -8,12 +8,8 @@ const vert3Src = await loadShader('./shaders/default3.vert');
 const selectVertexShader = (frag) => 
   frag.includes('version 300') ? vert3Src : vertSrc;
 
-async function main() {
-  const gl = createContext();
-
-  const url = new URL(window.location.href);
-  let shader = url.searchParams.get("shader") || 'default.frag';
-  const image = url.searchParams.get("image") || 'default.png';
+async function main(shader, image, width, height) {
+  const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
@@ -109,4 +105,11 @@ function initTextureSampler(gl, program, texture, unit=0) {
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
 
-main();
+
+const url = new URL(window.location.href);
+main(
+  url.searchParams.get("shader") || 'default.frag',
+  url.searchParams.get("image") || 'default.png',
+  url.searchParams.get("width") || window.innerWidth,
+  url.searchParams.get("height") || window.innerHeight,
+);
