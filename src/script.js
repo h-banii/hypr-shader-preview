@@ -5,6 +5,12 @@ const url = new URL(window.location.href);
 const input = document.createElement('input');
 input.type = 'file';
 
+const vertSrc = await loadShader('./shaders/default.vert');
+const vert3Src = await loadShader('./shaders/default3.vert');
+
+const selectVertexShader = (frag) => 
+  frag.includes('version 300') ? vert3Src : vertSrc;
+
 async function main() {
   const canvas = document.getElementById('shader-canvas');
 
@@ -24,18 +30,17 @@ async function main() {
   const shader = url.searchParams.get("shader") || 'default.frag';
   const image = url.searchParams.get("image") || 'default.png';
 
-  const vertSrc = await loadShader('./shaders/default.vert');
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
   const animation = new Animation;
 
-  start(gl, vertSrc, fragSrc, texture, animation);
+  start(gl, fragSrc, texture, animation);
 
   canvas.onclick = () => {
     askForFragmentShader()
-      .then(src => {
-        start(gl, vertSrc, src, texture, animation);
+      .then(frag => {
+        start(gl, frag, texture, animation);
       })
       .catch((e) =>
         console.log(`[${
@@ -70,8 +75,10 @@ function askForFragmentShader() {
   });
 }
 
-function start(gl, vertSrc, fragSrc, texture, animation) {
+function start(gl, fragSrc, texture, animation) {
   animation.stop();
+
+  const vertSrc = selectVertexShader(fragSrc);
 
   const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
   const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
