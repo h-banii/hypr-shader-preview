@@ -1,4 +1,4 @@
-import { loadShader, loadTexture, createShader, createProgram } from './webgl.js';
+import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl.js';
 import { Animation } from './animation';
 
 const url = new URL(window.location.href);
@@ -12,20 +12,7 @@ const selectVertexShader = (frag) =>
   frag.includes('version 300') ? vert3Src : vertSrc;
 
 async function main() {
-  const canvas = document.getElementById('shader-canvas');
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const gl = canvas.getContext("webgl2");
-
-  if (gl === null) {
-    alert("Failed to load WebGL, aw nyo...");
-    return;
-  }
-
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.0, 1.0, 1.0, 1.0);
+  const gl = createContext();
 
   const shader = url.searchParams.get("shader") || 'default.frag';
   const image = url.searchParams.get("image") || 'default.png';
@@ -37,10 +24,10 @@ async function main() {
 
   start(gl, fragSrc, texture, animation);
 
-  canvas.onclick = () => {
+  document.body.onclick = () => {
     askForFragmentShader()
-      .then(frag => {
-        start(gl, frag, texture, animation);
+      .then(src => {
+        start(gl, src, texture, animation);
       })
       .catch((e) =>
         console.log(`[${

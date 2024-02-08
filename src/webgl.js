@@ -1,3 +1,24 @@
+export function createContext() {
+  const canvas = document.createElement('canvas');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  document.body.appendChild(canvas);
+
+  const gl = canvas.getContext("webgl2");
+
+  if (gl === null) {
+    alert("Failed to load WebGL, aw nyo...");
+    return;
+  }
+
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+  return gl;
+}
+
 export function loadShader(url) {
   return fetch(url)
     .then(response => response.text())
