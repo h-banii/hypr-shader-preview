@@ -6,7 +6,9 @@ export function createContext() {
 
   document.body.appendChild(canvas);
 
-  const gl = canvas.getContext("webgl2");
+  const gl = canvas.getContext("webgl2", {
+    preserveDrawingBuffer: true // this allows us to save it to an image
+  });
 
   if (gl === null) {
     alert("Failed to load WebGL, aw nyo...");
