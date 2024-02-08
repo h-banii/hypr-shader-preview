@@ -7,12 +7,12 @@ uniform sampler2D tex;
 uniform float time;
 
 #define SNOW_LAYERS 6.0
-#define NUM_SNOWFLAKES_HOR 4.0
-#define NUM_SNOWFLAKES_VER 2.0
+#define NUM_SNOWFLAKES_HOR 1.0
+#define NUM_SNOWFLAKES_VER 1.0
 #define OPACITY 0.8
-#define INVERSE_SPEED 6.0
+#define INVERSE_SPEED 4.0
 
-const vec2 DIRECTION = vec2(1.0, -3.0);
+const vec2 DIRECTION = vec2(1.0, -6.0);
 const vec3 COLOR = vec3(255, 173, 210) / 255.0;
 
 float linear_snowflake(vec2 uv, vec2 diameter) {
@@ -44,22 +44,21 @@ vec2 grid(vec2 uv, vec2 dim) {
   return fract(uv * dim);
 }
 
-float snow_grid(vec2 uv, vec2 duv, vec2 dim, vec2 snowflake_dim) {
+float snow_grid(vec2 uv, vec2 duv, vec2 dim, vec2 snowflake_dim, bool sharp) {
   // add some values vertically so it's harder to see the grid pattern
-  uv.y += fract(uv.x) * 0.5;
+  uv += fract(vec2(uv.y, uv.x)) * vec2(0.3, 0.5);
 
   // let's chop our big normalized space into a bunch of "mini normalized spaces"
   // (we'll draw a snowflake on each "mini space")
   uv = grid(uv, dim);
 
-  // uv.y = (uv.y - 0.5) * 1.0 - abs(fract(time) - 0.5) * 2.0;
-
   // add space dislocation (aka make it move)
   // space = space + velocity * time = (space + delta_space)
   uv = fract(uv + duv + 1.0); 
 
-  // swap it with sharp_snowflake or make your own snowflake function
-  return sharp_snowflake(uv, snowflake_dim); 
+  if (sharp)
+    return sharp_snowflake(uv, snowflake_dim); 
+  return linear_snowflake(uv, snowflake_dim); 
 }
 
 vec3 screen_blend_mode(vec3 top, vec3 bottom) {
@@ -74,17 +73,21 @@ void main() {
   for (float i = 0.0; i < SNOW_LAYERS; i++) {
     vec2 direction = DIRECTION + i;
 
-    // dynamic diameter
-    float diameter = 0.05 * clamp(0.9 - abs(fract((time + (i + uv.x)) / 6.0) - 0.5) * 2.0, 0.0, 1.0);
+    bool is_back_layer = i > 3.0;
 
-    // fixed diameter
-    // float diameter = 0.05;
+    float diameter;
+    if (is_back_layer) {
+      diameter = 0.1 * clamp(0.8 - abs(fract((time + (i + dot(uv, vec2(2.0, 8.0)))) / 6.0) - 0.5) * 2.0, 0.0, 1.0);
+    } else {
+      diameter = 0.1;
+    }
 
     float snow = snow_grid(
       uv,
       vec2(0.2, 0.2) * i + direction * fract(time / (length(direction) * (INVERSE_SPEED + i))),
       vec2(NUM_SNOWFLAKES_HOR + i, NUM_SNOWFLAKES_VER + i),
-      vec2(diameter, diameter)
+      vec2(diameter),
+      is_back_layer
     );
 
     canvas += vec3(snow, snow, snow);
