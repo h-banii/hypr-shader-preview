@@ -2,8 +2,6 @@ import { loadShader, loadTexture, createShader, createProgram, createContext } f
 import { Animation } from './animation';
 import { askForFragmentShader } from './file.js';
 
-const url = new URL(window.location.href);
-
 const vertSrc = await loadShader('./shaders/default.vert');
 const vert3Src = await loadShader('./shaders/default3.vert');
 
@@ -13,6 +11,7 @@ const selectVertexShader = (frag) =>
 async function main() {
   const gl = createContext();
 
+  const url = new URL(window.location.href);
   const shader = url.searchParams.get("shader") || 'default.frag';
   const image = url.searchParams.get("image") || 'default.png';
 
@@ -21,13 +20,13 @@ async function main() {
 
   const animation = new Animation;
 
-  start(gl, fragSrc, texture, animation);
+  draw(gl, fragSrc, texture, animation);
 
   document.body.onclick = () => {
     askForFragmentShader()
-      .then(src => {
-        start(gl, src, texture, animation);
-      })
+      .then(src =>
+        draw(gl, src, texture, animation)
+      )
       .catch((e) =>
         console.log(`[${
           new Date().toLocaleString()
@@ -36,11 +35,10 @@ async function main() {
   }
 }
 
-function start(gl, fragSrc, texture, animation) {
+function draw(gl, fragSrc, texture, animation) {
   animation.stop();
 
   const vertSrc = selectVertexShader(fragSrc);
-
   const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
   const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
   const program = createProgram(gl, vertShader, fragShader);
@@ -78,11 +76,11 @@ function initSquareBuffer(gl, program) {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   const aPositionLocation = gl.getAttribLocation(program, "a_position");
-  const numComponents = 2; // pull out 2 values per iteration
-  const type = gl.FLOAT; // the data in the buffer is 32bit floats
-  const normalize = false; // don't normalize
-  const stride = 0; // how many bytes to get from one set of values to the next
-  const offset = 0; // how many bytes inside the buffer to start from
+  const numComponents = 2;
+  const type = gl.FLOAT;
+  const normalize = false;
+  const stride = 0;
+  const offset = 0;
   gl.vertexAttribPointer(
     aPositionLocation,
     numComponents,
@@ -96,11 +94,8 @@ function initSquareBuffer(gl, program) {
 }
 
 function initTextureSampler(gl, program, texture, unit=0) {
-  // Tell WebGL we want to affect texture unit 0
   gl.activeTexture(gl[`TEXTURE${unit}`]);
-  // Bind the texture to texture unit 0
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  // Tell the shader we bound the texture to texture unit 0
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
 
