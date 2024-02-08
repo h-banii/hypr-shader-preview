@@ -1,6 +1,6 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl.js';
 import { Animation } from './animation';
-import { askForFragmentShader } from './file.js';
+import { askForFragmentShader, downloadImage } from './file.js';
 
 const vertSrc = await loadShader('./shaders/default.vert');
 const vert3Src = await loadShader('./shaders/default3.vert');
@@ -12,7 +12,7 @@ async function main() {
   const gl = createContext();
 
   const url = new URL(window.location.href);
-  const shader = url.searchParams.get("shader") || 'default.frag';
+  let shader = url.searchParams.get("shader") || 'default.frag';
   const image = url.searchParams.get("image") || 'default.png';
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
@@ -22,17 +22,27 @@ async function main() {
 
   draw(gl, fragSrc, texture, animation);
 
-  document.body.onclick = () => {
-    askForFragmentShader()
-      .then(src =>
-        draw(gl, src, texture, animation)
-      )
-      .catch((e) =>
-        console.log(`[${
-          new Date().toLocaleString()
-        }] Failed to load fragment shader: ${e}`)
-      )
-  }
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('mouseup', e => {
+    switch(e.button) {
+      case 0:
+        askForFragmentShader()
+          .then(([filename, content]) => {
+            draw(gl, content, texture, animation)
+            shader = filename.match('[^/]+.frag')[0] || 'custom';
+          })
+          .catch((e) => console.log(
+            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+          ))
+        break;
+      case 2:
+        downloadImage(
+          gl.canvas,
+          `hypr-shader-preview-${shader.replace('.frag', '')}.png`
+        );
+        break;
+    }
+  })
 }
 
 function draw(gl, fragSrc, texture, animation) {
