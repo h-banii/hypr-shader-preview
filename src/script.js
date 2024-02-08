@@ -1,9 +1,8 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl.js';
 import { Animation } from './animation';
+import { askForFragmentShader } from './file.js';
 
 const url = new URL(window.location.href);
-const input = document.createElement('input');
-input.type = 'file';
 
 const vertSrc = await loadShader('./shaders/default.vert');
 const vert3Src = await loadShader('./shaders/default3.vert');
@@ -35,31 +34,6 @@ async function main() {
         }] Failed to load fragment shader: ${e}`)
       )
   }
-}
-
-function askForFragmentShader() {
-  return new Promise((resolve, reject) => {
-    input.onchange = e => { 
-       const file = e.target.files[0]; 
-
-      if (!file.name.includes('frag')) {
-        reject('file name does not contain "frag" extension');
-        return;
-      }
-
-       const reader = new FileReader();
-       reader.onload = readerEvent => {
-          resolve(readerEvent.target.result);
-       }
-       reader.readAsText(file,'UTF-8');
-    }
-
-    input.oncancel = e => {
-      reject('file input was canceled.');
-    }
-
-    input.click();
-  });
 }
 
 function start(gl, fragSrc, texture, animation) {
