@@ -3,11 +3,8 @@ import { Animation } from './animation';
 import { askForFragmentShader, downloadImage } from './file.js';
 import { doubleClick } from './utils.js';
 
-import vertSrc from '/shaders/default.vert?url&raw';
-import vert3Src from '/shaders/default3.vert?url&raw';
-
-const selectVertexShader = (frag) => 
-  frag.includes('version 300') ? vert3Src : vertSrc;
+import vertexSrc from '/shaders/default.vert?url&raw';
+import vertex3Src from '/shaders/default3.vert?url&raw';
 
 async function main(shader, image, width, height) {
   const gl = createContext(width, height);
@@ -39,7 +36,7 @@ async function main(shader, image, width, height) {
 function draw(gl, fragSrc, texture, animation) {
   animation.stop();
 
-  const vertSrc = selectVertexShader(fragSrc);
+  const vertSrc = fragSrc.includes('version 300') ? vertex3Src : vertexSrc;
   const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
   const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
   const program = createProgram(gl, vertShader, fragShader);
