@@ -1,7 +1,7 @@
-import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl.js';
+import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
-import { askForFragmentShader, downloadImage } from './file.js';
-import { doubleClick } from './utils.js';
+import { askForFragmentShader, downloadImage } from './file';
+import { doubleClick } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
