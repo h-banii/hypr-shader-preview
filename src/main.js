@@ -1,6 +1,6 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
-import { askForFragmentShader, downloadImage } from './file';
+import { askForFile, downloadImage } from './file';
 import { doubleClick } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
@@ -20,7 +20,7 @@ async function main(shader, image, width, height) {
     const filename = `hypr-shader-preview-${shader.replace('.frag', '')}.png`;
     downloadImage(gl.canvas, filename);
   }, () => {
-    askForFragmentShader()
+    askForFile('frag')
       .then(([filename, content]) => {
         draw(gl, content, texture, animation)
         shader = filename.match('[^/]+.frag')[0] || 'custom';

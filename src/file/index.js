@@ -1,21 +1,26 @@
 const input = document.createElement('input');
 input.type = 'file';
 
-export function askForFragmentShader() {
+export function askForFile(extension) {
   return new Promise((resolve, reject) => {
     input.onchange = inputEvent => {
       const file = inputEvent.target.files[0];
 
-      if (!file.name.includes('frag')) {
-        reject('file name does not contain "frag" extension');
+      if (!file) {
+        reject(`could not open file`);
         return;
       }
 
-       const reader = new FileReader();
-       reader.onload = readerEvent => {
-          resolve([file.name, readerEvent.target.result]);
-       }
-       reader.readAsText(file,'UTF-8');
+      if (extension && !file.name.includes(extension)) {
+        reject(`file name does not contain ${extension}`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = readerEvent => {
+        resolve([file.name, readerEvent.target.result]);
+      }
+      reader.readAsText(file,'UTF-8');
     }
 
     input.oncancel = () => {
