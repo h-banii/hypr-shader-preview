@@ -1,0 +1,4 @@
+public/images/*
+!public/images/default*
+public/shaders/*
+!public/shaders/default*
