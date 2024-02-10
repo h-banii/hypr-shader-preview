@@ -1,6 +1,7 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl.js';
 import { Animation } from './animation';
 import { askForFragmentShader, downloadImage } from './file.js';
+import { doubleClick } from './utils.js';
 
 import vertSrc from '/shaders/default.vert?url&raw';
 import vert3Src from '/shaders/default3.vert?url&raw';
@@ -18,27 +19,21 @@ async function main(shader, image, width, height) {
 
   draw(gl, fragSrc, texture, animation);
 
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('mouseup', e => {
-    switch(e.button) {
-      case 0:
-        askForFragmentShader()
-          .then(([filename, content]) => {
-            draw(gl, content, texture, animation)
-            shader = filename.match('[^/]+.frag')[0] || 'custom';
-          })
-          .catch((e) => console.log(
-            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
-          ))
-        break;
-      case 2:
-        downloadImage(
-          gl.canvas,
-          `hypr-shader-preview-${shader.replace('.frag', '')}.png`
-        );
-        break;
-    }
-  })
+  const clickAction = doubleClick(() => {
+    const filename = `hypr-shader-preview-${shader.replace('.frag', '')}.png`;
+    downloadImage(gl.canvas, filename);
+  }, () => {
+    askForFragmentShader()
+      .then(([filename, content]) => {
+        draw(gl, content, texture, animation)
+        shader = filename.match('[^/]+.frag')[0] || 'custom';
+      })
+      .catch((e) => console.log(
+        `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+      ))
+  }, 500);
+
+  document.addEventListener('mouseup', e => clickAction.next())
 }
 
 function draw(gl, fragSrc, texture, animation) {
@@ -104,7 +99,6 @@ function initTextureSampler(gl, program, texture, unit=0) {
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
-
 
 const url = new URL(window.location.href);
 main(
