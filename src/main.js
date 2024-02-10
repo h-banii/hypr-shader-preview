@@ -2,8 +2,8 @@ import { loadShader, loadTexture, createShader, createProgram, createContext } f
 import { Animation } from './animation';
 import { askForFragmentShader, downloadImage } from './file.js';
 
-const vertSrc = await loadShader('./shaders/default.vert');
-const vert3Src = await loadShader('./shaders/default3.vert');
+import vertSrc from '/shaders/default.vert?url&raw';
+import vert3Src from '/shaders/default3.vert?url&raw';
 
 const selectVertexShader = (frag) => 
   frag.includes('version 300') ? vert3Src : vertSrc;
@@ -11,8 +11,8 @@ const selectVertexShader = (frag) =>
 async function main(shader, image, width, height) {
   const gl = createContext(width, height);
 
-  const fragSrc = await loadShader(`./shaders/${shader}`)
-  const texture = await loadTexture(gl, `./images/${image}`);
+  const fragSrc = await loadShader(`/shaders/${shader}`)
+  const texture = await loadTexture(gl, `/images/${image}`);
 
   const animation = new Animation;
 
