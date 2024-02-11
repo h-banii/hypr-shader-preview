@@ -10,7 +10,7 @@
   },
   "author": "h-banii",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "vite": "^5.0.12"
   }
 }
