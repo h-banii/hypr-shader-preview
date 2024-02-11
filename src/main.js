@@ -63,7 +63,6 @@ function draw(gl, fragSrc, texture, animation) {
 
 function initSquareBuffer(gl, program) {
   const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
   const positions = [
     1.0, 1.0,
@@ -71,7 +70,6 @@ function initSquareBuffer(gl, program) {
     0.0, 0.0,
     1.0, 0.0
   ];
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   const aPositionLocation = gl.getAttribLocation(program, "a_position");
   const numComponents = 2;
@@ -79,6 +77,9 @@ function initSquareBuffer(gl, program) {
   const normalize = false;
   const stride = 0;
   const offset = 0;
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
   gl.vertexAttribPointer(
     aPositionLocation,
     numComponents,
@@ -87,7 +88,6 @@ function initSquareBuffer(gl, program) {
     stride,
     offset,
   );
-
   gl.enableVertexAttribArray(aPositionLocation);
 }
 
