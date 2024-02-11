@@ -5,6 +5,21 @@ This is a WebGL program to preview Hyprland shaders directly in the browser!
 It allows you to easily debug, take screenshots, and record your shaders
 without having to load them into Hyprland.
 
+## Demo
+
+<details>
+  <summary>Sakura petals</summary>
+  <p>
+    <video src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/35cccd25-f6ae-46e5-a3bb-96112e3d35ff">
+    </video>
+    <em>
+      anime: <a href="https://www.crunchyroll.com/series/GY5V74MPY/citrus">Citrus</a><br>
+      wallpaper: <a href="https://www.reddit.com/r/CitrusManga/comments/8vjcpe/">reddit</a><br>
+      music: <a href="https://youtu.be/-nmeHZ8rOd8?si=_fZFE2syWFt0SVdL">さりい bgm (YouTube)</a>, <a href="https://twitter.com/sarixbgm">sarixbgm (twitter)</a>
+    </em>
+  </p>
+</details>
+
 ## Supported variables
 
 It uses the same variable names that Hyprland expects, so you *probably* don't
