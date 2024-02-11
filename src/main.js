@@ -1,7 +1,7 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
 import { askForFile, screenshotCanvas, CanvasRecorder } from './file';
-import { doubleClick, queryParameters } from './utils';
+import { doubleClick, queryParameters, generateFilename } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
@@ -18,8 +18,7 @@ async function main({ shader, image, width, height, fps }) {
   draw(gl, fragSrc, texture, animation);
 
   const clickAction = doubleClick(() => {
-    const filename = `hypr-shader-preview-${shader.replace('.frag', '')}`;
-    screenshotCanvas(gl.canvas, filename);
+    screenshotCanvas(gl.canvas, generateFilename('hyprshaderpreview', shader, image));
   }, () => {
     askForFile('frag')
       .then(([filename, content]) => {
@@ -41,7 +40,7 @@ async function main({ shader, image, width, height, fps }) {
           recorder.start();
         break;
       case 's':
-        recorder.save(`hypr-shader-preview-${shader}`)
+        recorder.save(generateFilename('hyprshaderpreview', shader, image))
         break;
     }
   })
