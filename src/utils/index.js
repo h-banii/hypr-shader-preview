@@ -17,9 +17,19 @@ export function *doubleClick(one, two, interval) {
   }
 }
 
+function convert(type, value) {
+  switch(type) {
+    case 'boolean':
+      return value == 'true';
+    case 'number':
+      return Number(value);
+  }
+  return value;
+}
+
 export function queryParameters(func, parameters, url = new URL(window.location.href)) {
   for (const key in parameters) {
-    parameters[key] = url.searchParams.get(key) || parameters[key];
+    parameters[key] = convert(typeof parameters[key], url.searchParams.get(key)) || parameters[key];
   }
 
   func(parameters)
