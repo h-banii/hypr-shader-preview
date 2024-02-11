@@ -9,8 +9,8 @@ import vertex3Src from '/shaders/default3.vert?url&raw';
 async function main(shader, image, width, height) {
   const gl = createContext(width, height);
 
-  const fragSrc = await loadShader(`/shaders/${shader}`)
-  const texture = await loadTexture(gl, `/images/${image}`);
+  const fragSrc = await loadShader(`./shaders/${shader}`)
+  const texture = await loadTexture(gl, `./images/${image}`);
 
   const animation = new Animation;
 
