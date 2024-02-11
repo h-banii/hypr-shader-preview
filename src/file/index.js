@@ -54,17 +54,19 @@ export function screenshotCanvas(canvas, name='hypr-shader-preview-output') {
   )
 }
 
-export class CanvasRecorder {
+export class CanvasRecorder extends EventTarget {
   constructor(canvas, fps) {
+    super();
+
     this.canvas = canvas;
     this.fps = fps;
 
     this.chunks = [];
     this.stream = canvas.captureStream(fps);
     this.recorder = new MediaRecorder(this.stream);
+    this.recording = false;
 
     this.recorder.ondataavailable = (e) => this.chunks.push(e.data);
-    this.recording = false;
   }
 
   start() {
@@ -73,6 +75,7 @@ export class CanvasRecorder {
     )
     this.recorder.start();
     this.recording = true;
+    this.dispatchRecordingEvent();
   }
 
   stop() {
@@ -81,6 +84,7 @@ export class CanvasRecorder {
     )
     this.recorder.stop();
     this.recording = false;
+    this.dispatchRecordingEvent();
   }
 
   reset() {
@@ -92,5 +96,10 @@ export class CanvasRecorder {
     const url = URL.createObjectURL(blob);
     download(filename, url);
     this.reset();
+  }
+
+  dispatchRecordingEvent() {
+    const event = new CustomEvent("recording", { detail: this.recording });
+    this.dispatchEvent(event);
   }
 }
