@@ -2,12 +2,32 @@
 
 This is a WebGL program to preview Hyprland shaders directly in the browser!
 
-It allows you to easily debug, record, and take screenshots of your shaders
-without loading them into Hyprland.
+It allows you to easily debug, take screenshots, and record your shaders
+without having to load them into Hyprland.
+
+## Supported variables
+
+It uses the same variable names that Hyprland expects, so you *probably* don't
+need to modify your hyprland shaders, they're likely already compatible.
+
+```glsl
+varying vec2 v_texcoord
+uniform sampler2D tex
+uniform float time
+```
+
+I'm not sure what other variables Hyprland supports, but those 3 seems to be
+enough to run all shaders I've seen so far. Open an issue if you know another
+variable, I'll look into it.
+
+## Debug shaders
+
+Compilation errors are printed in the browser's console log.
 
 ## Install
 
-To get started, you just need Nodejs and a browser.
+To get started, you just need Node.js and a browser capable of running WebGL
+(aka almost any modern browser).
 
 ```sh
 git clone https://github.com/h-banii/hypr-shader-preview.git
@@ -17,8 +37,8 @@ npm i
 
 ## Usage
 
-Start the server then open the url in your browser. By default it's on port
-[5173](http://localhost:5173)
+Start the server then access it in your browser
+[http://localhost:5173](http://localhost:5173)
 
 ```sh
 npm start
@@ -30,21 +50,23 @@ npm start
   ➜  press h + enter to show help
 ```
 
-Once the web page loads it *should* an image, which is running the default
-shader (do-nothing). To change which shader gets displayed, read the following
-sections.
+By default it should display an unmodified image (default shader). To run a
+custom shader, do the following:
+
+1) copy your shader to `src/public/shaders`
+2) open `http://localhost:5173?shader=YOUR_SHADER_NAME_HERE.frag`
+3) enjoy
 
 ### Query parameters
 
-Configuration is done via query parameters in the URL.
+Configuration is done via optional query parameters
 
-- shader: filename of the shader relative to `src/shaders/`. Ex: default.frag
-- image: filename of the background image relative to `src/images/`. Ex: default.png
-- width: width in pixels of the canvas. Ex: 1920
-- height: height in pixels of the canvas. Ex: 1080
+- shader: filename of the shader relative to `src/public/shaders/`
+- image: filename of the background image relative to `src/public/images/`
+- width: width in pixels of the canvas
+- height: height in pixels of the canvas
 
-If you are not familiar with query parameters, it starts with `?` and each
-parameter is separated by `&`. Here's an example using all of them:
+Here's an example using all of them:
 
 [http://localhost:5173?shader=snow.frag&image=default.png&width=1920&height=1080](http://localhost:5173?shader=snow.frag&image=default.png&width=1920&height=1080)
 
@@ -73,34 +95,29 @@ parameter is separated by `&`. Here's an example using all of them:
 <!---->
 <!-- [http://localhost:5173?width=1920&height=1080](http://localhost:5173?width=1920&height=1080). -->
 
-## Debug shaders
-
-If a shader fails to load, check the console log in your browser. Any compilation
-errors it encounters are printed there.
-
-## Load shaders located elsewhere
-
-Just *left-click* it!
-
-It'll open a file input for you to select any fragment shader you want to load.
-If it fails, check the console log.
-
 ##  Take screenshots
 
-Just *right-click* it!
+Just *click* it!
 
 The screenshot gets saved automatically to your browser's default download
 folder.
 
+## Load shaders not located in `src/shaders/`
+
+Just *double-click* it!
+
+It'll open a file input for you to select any fragment shader you want to load.
+If it fails, check the console log.
+
 ## Recording
 
-Just use OBS, you can load it inside a *browser source*!
+Use OBS, you can load it inside a *browser source*
 
 ## Limitations
 
 The background image is static. The shaders get applied to a static image, not
 to your current display, but that's fine because the goal is just to preview
-shaders not to actually apply it to your display. Also, you can just take a
+shaders not to apply it to your actual display. Also, you can just take a
 screenshot of your desktop and use it as background image for the shaders.
 
 In the future I might try adding support for video files as background for the
