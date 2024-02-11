@@ -32,7 +32,9 @@ html, body{
   bottom: 0;
 }
 
-button {
+button, .timestamp {
+  font-size: 14px;
+  display: inline-block;
   border-radius: 8px;
   margin: 8px 2px;
   padding: 8px 10px;

@@ -54,6 +54,35 @@ export function screenshotCanvas(canvas, name='hypr-shader-preview-output') {
   )
 }
 
+class Timestamp {
+  constructor(callback, interval = 1000) {
+    this.interval = interval;
+    this.intervalId = null;
+    this.time = 0;
+    this.callback = callback;
+  }
+
+  start() {
+    if (this.intervalId) return;
+    let previousTime = Date.now();
+    this.intervalId = setInterval(() => {
+      const now = Date.now();
+      this.time += now - previousTime;
+      previousTime = now;
+      this.callback(this.time);
+    }, this.interval);
+  }
+
+  reset() {
+    this.time = 0;
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+    this.intervalId = null;
+  }
+}
+
 export class CanvasRecorder extends EventTarget {
   constructor(canvas, fps) {
     super();
@@ -66,6 +95,10 @@ export class CanvasRecorder extends EventTarget {
     this.recorder = new MediaRecorder(this.stream);
     this.recording = false;
 
+    this.timestamp = new Timestamp((time) => {
+      this.dispatchTimestampEvent(time)
+    });
+
     this.recorder.ondataavailable = (e) => this.chunks.push(e.data);
   }
 
@@ -73,9 +106,11 @@ export class CanvasRecorder extends EventTarget {
     console.log(
       `[${new Date().toLocaleString()}] Started recording`
     )
+    this.reset();
     this.recorder.start();
+    this.timestamp.start();
     this.recording = true;
-    this.dispatchRecordingEvent();
+    this.dispatchRecordingEvent(this.recording);
   }
 
   stop() {
@@ -83,12 +118,15 @@ export class CanvasRecorder extends EventTarget {
       `[${new Date().toLocaleString()}] Stopped recording`
     )
     this.recorder.stop();
+    this.timestamp.stop();
     this.recording = false;
-    this.dispatchRecordingEvent();
+    this.dispatchRecordingEvent(this.recording);
   }
 
   reset() {
     this.chunks = [];
+    this.timestamp.reset();
+    this.dispatchResetEvent();
   }
 
   save(filename = 'hypr-shader-preview-video') {
@@ -98,8 +136,18 @@ export class CanvasRecorder extends EventTarget {
     this.reset();
   }
 
-  dispatchRecordingEvent() {
-    const event = new CustomEvent("recording", { detail: this.recording });
+  dispatchRecordingEvent(recording) {
+    const event = new CustomEvent("recording", { detail: recording });
+    this.dispatchEvent(event);
+  }
+
+  dispatchTimestampEvent(timestamp) {
+    const event = new CustomEvent("timestamp", { detail: timestamp });
+    this.dispatchEvent(event);
+  }
+
+  dispatchResetEvent() {
+    const event = new Event("reset");
     this.dispatchEvent(event);
   }
 }
