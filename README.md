@@ -5,6 +5,8 @@ This is a WebGL program to preview Hyprland shaders directly in the browser!
 It allows you to easily debug, take screenshots, and record your shaders
 without having to load them into Hyprland.
 
+<img src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/6a28eb70-6e62-44c6-b09e-fc568a723755" width="800"/>
+
 ## Demo
 
 <details>
