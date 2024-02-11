@@ -83,7 +83,7 @@ Configuration is done via optional query parameters
 
 Here's an example using all of them:
 
-[http://localhost:5173?shader=snow.frag&image=default.png&width=1920&height=1080](http://localhost:5173?shader=snow.frag&image=default.png&width=1920&height=1080)
+[http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080](http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080)
 
 <!-- ### shader -->
 <!---->
