@@ -128,7 +128,8 @@ If it fails, check the console log.
 
 ## Recording
 
-Use OBS, you can load it inside a *browser source*
+Use OBS, you can load it inside a *browser source*. In the future I'll add a
+button to record videos and gifs in the browser.
 
 ## Version 3.00
 
@@ -152,3 +153,10 @@ An interesting idea would be to record your screen on OBS with a display/window
 source then apply the shaders on it. But that requires creating an OBS plugin
 and it feels kinda overkill compared to this simple web page that works inside
 a regular browser...
+
+# Goals
+
+- [X] Compile and run Hyprland shaders
+- [X] Take screenshots in the browser
+- [ ] Record videos in the browser
+- [ ] Record gifs in the browser
