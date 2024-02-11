@@ -1,7 +1,7 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
 import { askForFile, screenshotCanvas, CanvasRecorder } from './file';
-import { doubleClick, queryParameters, generateFilename } from './utils';
+import { doubleClick, queryParameters, generateFilename, createElement } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
@@ -17,12 +17,53 @@ async function main({ shader, image, width, height, fps }) {
 
   draw(gl, fragSrc, texture, animation);
 
-  configureKeyboardActions(recorder, shader, image);
-  configureClickActions(gl, texture, animation, shader, image);
+  const filename = () =>
+    generateFilename('hypr-shader-preview', shader, image);
+
+  configureToolbox(gl, recorder, filename);
+  configureKeyboardActions(recorder, filename);
+  configureClickActions(gl, texture, animation, filename);
 }
 
-function configureKeyboardActions(recorder) {
-function configureKeyboardActions(recorder, shader, image) {
+function configureToolbox(gl, recorder, filename) {
+  const screenshotToolbox = createElement({ classList: 'left', children: [
+    createElement({
+      type: 'button',
+      innerText: ' screenshot',
+      onclick: function() {
+        screenshotCanvas(gl.canvas, filename());
+      }
+    }),
+  ]});
+
+  const recordingToolbox = createElement({ classList: 'right', children: [
+    createElement({
+      type: 'button',
+      innerText: '⊙ record',
+      onclick: function() {
+        if (recorder.recording) {
+          recorder.stop();
+          this.innerText = '⊙ record';
+        } else {
+          recorder.start();
+          this.innerText = '◉ stop';
+        }
+      },
+    }),
+    createElement({
+      type: 'button',
+      innerText: 'save',
+      onclick: function() {
+        recorder.save(filename());
+      },
+    }),
+  ]});
+
+  document.body.append(screenshotToolbox);
+  document.body.append(recordingToolbox);
+}
+
+function configureKeyboardActions(recorder, filename) {
   document.addEventListener('keyup', e => {
     switch(e.key.toLowerCase()) {
       case 'r':
@@ -32,27 +73,25 @@ function configureKeyboardActions(recorder, shader, image) {
           recorder.start();
         break;
       case 's':
-        const filename = generateFilename('hyprshaderpreview', shader, image);
-        recorder.save(filename);
+        recorder.save(filename());
         break;
     }
   })
 }
 
-function configureClickActions(gl, texture, animation, shader, image) {
+function configureClickActions(gl, texture, animation, filename) {
   const clickAction = doubleClick(() => {
-    screenshotCanvas(gl.canvas, generateFilename('hyprshaderpreview', shader, image));
+    screenshotCanvas(gl.canvas, filename());
   }, () => {
     askForFile('frag')
       .then(([filename, content]) => {
         draw(gl, content, texture, animation)
-        shader = filename.match('[^/]+.frag')[0] || 'custom';
       })
       .catch((e) => console.log(
         `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
       ))
   }, 500);
-  document.addEventListener('mouseup', e => clickAction.next())
+  gl.canvas.addEventListener('mouseup', e => clickAction.next())
 }
 
 function draw(gl, fragSrc, texture, animation) {

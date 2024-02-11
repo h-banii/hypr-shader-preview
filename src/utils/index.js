@@ -34,3 +34,24 @@ export const generateFilename = function(prefix, ...parameters) {
   return filename;
 }
 
+export function createButton(container) {
+  const element = document.createElement('button');
+  if (container) container.appendChild(element);
+  return element;
+}
+
+export function createElement({ type = 'div', children = [], setup = () => {}, ...rest }) {
+  const element = document.createElement(type);
+
+  for (const parameter in rest) {
+    element[parameter] = rest[parameter];
+  }
+
+  for (const child of children) {
+    element.append(child);
+  }
+
+  setup(element);
+
+  return element;
+}
