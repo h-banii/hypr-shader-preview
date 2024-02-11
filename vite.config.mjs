@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   // plugins: [viteSingleFile()],
   root: 'src',
+  base: '/hypr-shader-preview/',
   build: {
     outDir: '../dist',
     emptyOutDir: true
