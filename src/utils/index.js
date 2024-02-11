@@ -16,3 +16,11 @@ export function *doubleClick(one, two, interval) {
     yield;
   }
 }
+
+export function queryParameters(func, parameters, url = new URL(window.location.href)) {
+  for (const key in parameters) {
+    parameters[key] = url.searchParams.get(key) || parameters[key];
+  }
+
+  func(parameters)
+}

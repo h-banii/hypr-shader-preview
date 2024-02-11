@@ -1,12 +1,12 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
 import { askForFile, downloadImage } from './file';
-import { doubleClick } from './utils';
+import { doubleClick, queryParameters } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main(shader, image, width, height) {
+async function main({ shader, image, width, height }) {
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
@@ -97,10 +97,9 @@ function initTextureSampler(gl, program, texture, unit=0) {
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
 
-const url = new URL(window.location.href);
-main(
-  url.searchParams.get("shader") || 'default.frag',
-  url.searchParams.get("image") || 'default.png',
-  url.searchParams.get("width") || window.innerWidth,
-  url.searchParams.get("height") || window.innerHeight,
-);
+queryParameters(main, {
+  "shader" : 'default.frag',
+  "image"  : 'default.png',
+  "width"  : window.innerWidth,
+  "height" : window.innerHeight,
+})
