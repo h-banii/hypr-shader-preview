@@ -23,6 +23,10 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   if (!hide_buttons) configureToolbox(gl, recorder, filename);
   configureKeyboardActions(recorder, filename);
   configureClickActions(gl, texture, animation, filename);
+
+  recorder.addEventListener('timestamp', e => {
+    console.log(e.detail)
+  })
 }
 
 function configureToolbox(gl, recorder, filename) {
@@ -43,11 +47,14 @@ function configureToolbox(gl, recorder, filename) {
       onclick: function() {
         if (recorder.recording) {
           recorder.stop();
-          this.innerText = '⊙ record';
         } else {
           recorder.start();
-          this.innerText = '◉ stop';
         }
+      },
+      setup: self => {
+        recorder.addEventListener('recording', e => {
+          self.innerText = e.detail ? '◉ stop' : '⊙ record';
+        })
       },
     }),
     createElement({
