@@ -23,14 +23,10 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   if (!hide_buttons) configureToolbox(gl, recorder, filename);
   configureKeyboardActions(recorder, filename);
   configureClickActions(gl, texture, animation, filename);
-
-  recorder.addEventListener('timestamp', e => {
-    console.log(e.detail)
-  })
 }
 
 function configureToolbox(gl, recorder, filename) {
-  const screenshotToolbox = createElement({ classList: 'left', children: [
+  const screenshotToolbox = createElement({ classList: 'right', children: [
     createElement({
       type: 'button',
       innerText: ' screenshot',
@@ -40,10 +36,27 @@ function configureToolbox(gl, recorder, filename) {
     }),
   ]});
 
-  const recordingToolbox = createElement({ classList: 'right', children: [
+  const recordingToolbox = createElement({ classList: 'left', children: [
+    createElement({
+      classList: 'timestamp',
+      innerText: '00:00',
+      setup: self => {
+        recorder.addEventListener('timestamp', e => {
+          if (self.style.display == 'none') self.style.display = `inline-block`;
+          self.innerText = new Date(e.detail).toLocaleString('en-GB', {
+            minute: '2-digit',
+            second: '2-digit',
+            timezone: 'UTC'
+          });
+        })
+        recorder.addEventListener('reset', () => {
+          self.innerText = '00:00';
+        })
+      },
+    }),
     createElement({
       type: 'button',
-      innerText: '⊙ record',
+      innerText: '◎ record',
       onclick: function() {
         if (recorder.recording) {
           recorder.stop();
@@ -53,15 +66,29 @@ function configureToolbox(gl, recorder, filename) {
       },
       setup: self => {
         recorder.addEventListener('recording', e => {
-          self.innerText = e.detail ? '◉ stop' : '⊙ record';
+          self.innerText = e.detail ? '◉ stop' : '◎ record';
         })
       },
     }),
     createElement({
       type: 'button',
       innerText: 'save',
+      style: 'display: none',
       onclick: function() {
         recorder.save(filename());
+      },
+      setup: self => {
+        recorder.addEventListener('recording', e => {
+          const recording = e.detail;
+          if (!recording) {
+            self.style.display = '';
+          } else {
+            self.style.display = 'none';
+          }
+        })
+        recorder.addEventListener('reset', () => {
+          self.style.display = 'none';
+        })
       },
     }),
   ]});
