@@ -128,6 +128,14 @@ If it fails, check the console log.
 
 Use OBS, you can load it inside a *browser source*
 
+## Version 3.00
+
+WebGL supports version 3.00 of the language, using the `#version 300 es`
+directive, and so does this project. But I realized that Hyprland doesn't seem
+to support it, or maybe it needs some modification.
+
+So... this is a not very useful feature at the moment, but it's there.
+
 ## Limitations
 
 The background image is static. The shaders get applied to a static image, not
