@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "author": "h-banii",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "vite": "^5.0.12"
   }
