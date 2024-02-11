@@ -1,7 +1,7 @@
-const input = document.createElement('input');
-input.type = 'file';
-
 export function askForFile(extension) {
+  const input = document.createElement('input');
+  input.type = 'file';
+
   return new Promise((resolve, reject) => {
     input.onchange = inputEvent => {
       const file = inputEvent.target.files[0];
@@ -31,21 +31,25 @@ export function askForFile(extension) {
   });
 }
 
-const imageCanvas = document.createElement('canvas')
-const imageContext = imageCanvas.getContext('2d');
-const imageLink = document.createElement('a');
-
-export function downloadImage(canvas, name='hypr-shader-preview-output.png') {
-  imageCanvas.width = canvas.width;
-  imageCanvas.height = canvas.height;
-
-  imageContext.drawImage(canvas, 0, 0);
-
+function download(filename, url) {
   // https://stackoverflow.com/a/44487883
-  imageLink.setAttribute('download', name);
-  imageLink.setAttribute('href', imageCanvas
+  const link = document.createElement('a');
+  link.setAttribute('download', filename);
+  link.setAttribute('href', url);
+  link.click();
+}
+
+export function screenshotCanvas(canvas, name='hypr-shader-preview-output.png') {
+  const offscreenCanvas = document.createElement('canvas')
+  const offscreenContext = offscreenCanvas.getContext('2d');
+
+  offscreenCanvas.width = canvas.width;
+  offscreenCanvas.height = canvas.height;
+
+  offscreenContext.drawImage(canvas, 0, 0);
+
+  download(name, offscreenCanvas
     .toDataURL("image/png")
     .replace("image/png", "image/octet-stream")
-  );
-  imageLink.click();
+  )
 }
