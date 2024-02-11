@@ -1,23 +1,24 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
-import { askForFile, screenshotCanvas } from './file';
+import { askForFile, screenshotCanvas, CanvasRecorder } from './file';
 import { doubleClick, queryParameters } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height }) {
+async function main({ shader, image, width, height, fps }) {
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
+  const recorder = new CanvasRecorder(gl.canvas, fps);
   const animation = new Animation;
 
   draw(gl, fragSrc, texture, animation);
 
   const clickAction = doubleClick(() => {
-    const filename = `hypr-shader-preview-${shader.replace('.frag', '')}.png`;
+    const filename = `hypr-shader-preview-${shader.replace('.frag', '')}`;
     screenshotCanvas(gl.canvas, filename);
   }, () => {
     askForFile('frag')
@@ -31,6 +32,19 @@ async function main({ shader, image, width, height }) {
   }, 500);
 
   document.addEventListener('mouseup', e => clickAction.next())
+  document.addEventListener('keyup', e => {
+    switch(e.key.toLowerCase()) {
+      case 'r':
+        if (recorder.recording)
+          recorder.stop();
+        else
+          recorder.start();
+        break;
+      case 's':
+        recorder.save(`hypr-shader-preview-${shader}`)
+        break;
+    }
+  })
 }
 
 function draw(gl, fragSrc, texture, animation) {
@@ -102,4 +116,5 @@ queryParameters(main, {
   "image"  : 'default.png',
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
+  "fps" : 30,
 })

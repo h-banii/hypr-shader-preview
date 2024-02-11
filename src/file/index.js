@@ -39,7 +39,7 @@ function download(filename, url) {
   link.click();
 }
 
-export function screenshotCanvas(canvas, name='hypr-shader-preview-output.png') {
+export function screenshotCanvas(canvas, name='hypr-shader-preview-output') {
   const offscreenCanvas = document.createElement('canvas')
   const offscreenContext = offscreenCanvas.getContext('2d');
 
@@ -48,8 +48,49 @@ export function screenshotCanvas(canvas, name='hypr-shader-preview-output.png') 
 
   offscreenContext.drawImage(canvas, 0, 0);
 
-  download(name, offscreenCanvas
+  download(`${name}.png`, offscreenCanvas
     .toDataURL("image/png")
     .replace("image/png", "image/octet-stream")
   )
+}
+
+export class CanvasRecorder {
+  constructor(canvas, fps) {
+    this.canvas = canvas;
+    this.fps = fps;
+
+    this.chunks = [];
+    this.stream = canvas.captureStream(fps);
+    this.recorder = new MediaRecorder(this.stream);
+
+    this.recorder.ondataavailable = (e) => this.chunks.push(e.data);
+    this.recording = false;
+  }
+
+  start() {
+    console.log(
+      `[${new Date().toLocaleString()}] Started recording`
+    )
+    this.recorder.start();
+    this.recording = true;
+  }
+
+  stop() {
+    console.log(
+      `[${new Date().toLocaleString()}] Stopped recording`
+    )
+    this.recorder.stop();
+    this.recording = false;
+  }
+
+  reset() {
+    this.chunks = [];
+  }
+
+  save(filename = 'hypr-shader-preview-video') {
+    const blob = new Blob(this.chunks, { 'type' : 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    download(filename, url);
+    this.reset();
+  }
 }
