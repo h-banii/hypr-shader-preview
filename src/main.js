@@ -6,7 +6,7 @@ import { doubleClick, queryParameters, generateFilename, createElement } from '.
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps }) {
+async function main({ shader, image, width, height, fps, hide_buttons }) {
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
@@ -20,7 +20,7 @@ async function main({ shader, image, width, height, fps }) {
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
 
-  configureToolbox(gl, recorder, filename);
+  if (!hide_buttons) configureToolbox(gl, recorder, filename);
   configureKeyboardActions(recorder, filename);
   configureClickActions(gl, texture, animation, filename);
 }
@@ -164,4 +164,5 @@ queryParameters(main, {
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
   "fps" : 30,
+  "hide_buttons": false,
 })
