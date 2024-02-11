@@ -17,6 +17,29 @@ async function main({ shader, image, width, height, fps }) {
 
   draw(gl, fragSrc, texture, animation);
 
+  configureKeyboardActions(recorder, shader, image);
+  configureClickActions(gl, texture, animation, shader, image);
+}
+
+function configureKeyboardActions(recorder) {
+function configureKeyboardActions(recorder, shader, image) {
+  document.addEventListener('keyup', e => {
+    switch(e.key.toLowerCase()) {
+      case 'r':
+        if (recorder.recording)
+          recorder.stop();
+        else
+          recorder.start();
+        break;
+      case 's':
+        const filename = generateFilename('hyprshaderpreview', shader, image);
+        recorder.save(filename);
+        break;
+    }
+  })
+}
+
+function configureClickActions(gl, texture, animation, shader, image) {
   const clickAction = doubleClick(() => {
     screenshotCanvas(gl.canvas, generateFilename('hyprshaderpreview', shader, image));
   }, () => {
@@ -29,21 +52,7 @@ async function main({ shader, image, width, height, fps }) {
         `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
       ))
   }, 500);
-
   document.addEventListener('mouseup', e => clickAction.next())
-  document.addEventListener('keyup', e => {
-    switch(e.key.toLowerCase()) {
-      case 'r':
-        if (recorder.recording)
-          recorder.stop();
-        else
-          recorder.start();
-        break;
-      case 's':
-        recorder.save(generateFilename('hyprshaderpreview', shader, image))
-        break;
-    }
-  })
 }
 
 function draw(gl, fragSrc, texture, animation) {
