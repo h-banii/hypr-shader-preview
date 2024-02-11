@@ -128,8 +128,9 @@ If it fails, check the console log.
 
 ## Recording
 
-Use OBS, you can load it inside a *browser source*. In the future I'll add a
-button to record videos and gifs in the browser.
+Press R to start recording, press it again to stop, then press S to save it.
+
+Or use OBS, you can load it inside a *browser source*.
 
 ## Version 3.00
 
@@ -158,5 +159,6 @@ a regular browser...
 
 - [X] Compile and run Hyprland shaders
 - [X] Take screenshots in the browser
-- [ ] Record videos in the browser
+- [X] Record videos in the browser
+- [ ] Show buttons to take screenshots/record
 - [ ] Record gifs in the browser
