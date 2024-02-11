@@ -24,3 +24,13 @@ export function queryParameters(func, parameters, url = new URL(window.location.
 
   func(parameters)
 }
+
+export const generateFilename = function(prefix, ...parameters) {
+  const regex = /\..+/g;
+  let filename = prefix;
+  for (const params of parameters) {
+    filename += `-${params.replace(regex, '')}`;
+  }
+  return filename;
+}
+
