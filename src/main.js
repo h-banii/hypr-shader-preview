@@ -26,7 +26,7 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
 }
 
 function configureToolbox(gl, recorder, filename) {
-  const screenshotToolbox = createElement({ classList: 'right', children: [
+  const screenshotButtons = createElement({ classList: 'bottom right', children: [
     createElement({
       type: 'button',
       innerText: ' screenshot',
@@ -36,7 +36,7 @@ function configureToolbox(gl, recorder, filename) {
     }),
   ]});
 
-  const recordingToolbox = createElement({ classList: 'left', children: [
+  const recordingButtons = createElement({ classList: 'bottom left', children: [
     createElement({
       classList: 'timestamp',
       innerText: '00:00',
@@ -93,8 +93,8 @@ function configureToolbox(gl, recorder, filename) {
     }),
   ]});
 
-  document.body.append(screenshotToolbox);
-  document.body.append(recordingToolbox);
+  document.body.append(screenshotButtons);
+  document.body.append(recordingButtons);
 }
 
 function configureKeyboardActions(recorder, filename) {
