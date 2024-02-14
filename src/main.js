@@ -50,7 +50,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
             draw(gl, fragSrc, texture, animation)
           })
           .catch((e) => console.log(
-            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+            `[${new Date().toLocaleString()}] Failed to load background image: ${e}`
           ))
       }
     }),
