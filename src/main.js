@@ -20,12 +20,28 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
 
-  if (!hide_buttons) configureToolbox(gl, recorder, filename);
+  if (!hide_buttons) configureButtonActions(gl, texture, animation, recorder, filename);
   configureKeyboardActions(recorder, filename);
   configureClickActions(gl, texture, animation, filename);
 }
 
-function configureToolbox(gl, recorder, filename) {
+function configureButtonActions(gl, texture, animation, recorder, filename) {
+  const fileButtons = createElement({ classList: 'top left', children: [
+    createElement({
+      type: 'button',
+      innerText: ' load shader',
+      onclick: function() {
+        askForFile('frag')
+          .then(([filename, content]) => {
+            draw(gl, content, texture, animation)
+          })
+          .catch((e) => console.log(
+            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+          ))
+      }
+    }),
+  ]});
+
   const screenshotButtons = createElement({ classList: 'bottom right', children: [
     createElement({
       type: 'button',
@@ -93,6 +109,7 @@ function configureToolbox(gl, recorder, filename) {
     }),
   ]});
 
+  document.body.append(fileButtons);
   document.body.append(screenshotButtons);
   document.body.append(recordingButtons);
 }
