@@ -1,6 +1,7 @@
 # Hypr-shader-preview
 
 This is a WebGL program to preview Hyprland shaders directly in the browser!
+You can try it out [here](https://h-banii.github.io/hypr-shader-preview/?shader=sakura.frag)
 
 It allows you to easily debug, take screenshots, and record your shaders
 without having to load them into Hyprland.
@@ -41,10 +42,16 @@ variable, I'll look into it.
 
 Compilation errors are printed in the browser's console log.
 
-## Install
+## Usage
 
-To get started, you just need Node.js and a browser capable of running WebGL
-(aka almost any modern browser).
+### Quick start
+
+Go to [https://h-banii.github.io/hypr-shader-preview](https://h-banii.github.io/hypr-shader-preview) and enjoy!
+
+### For developers (preferred)
+
+To get started, clone the repository and install the dependencies.
+The only requirement is [Node.js](https://nodejs.org/en)
 
 ```sh
 git clone https://github.com/h-banii/hypr-shader-preview.git
@@ -52,9 +59,7 @@ cd hypr-shader-preview
 npm i
 ```
 
-## Usage
-
-Start the server then access it in your browser
+Then start the server and access it in your browser
 [http://localhost:5173](http://localhost:5173)
 
 ```sh
@@ -67,17 +72,11 @@ npm start
   ➜  press h + enter to show help
 ```
 
-By default it should display an unmodified image and a few buttons, which are
-auto-explicative:
+### Buttons
 
-<details>
-  <summary>Preview</summary>
-  <image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/a84cf1ca-52b5-4039-8e32-c0e6df1d2585" />
-</details>
+<image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/a84cf1ca-52b5-4039-8e32-c0e6df1d2585" />
 
 ### Query parameters
-
-Configuration can also be done via query parameters
 
 - shader: filename of the shader relative to `src/public/shaders/`
 - image: filename of the background image relative to `src/public/images/`
@@ -127,4 +126,5 @@ simple web page that works inside a regular browser...
 - [X] Take screenshots in the browser
 - [X] Record videos in the browser
 - [X] Show buttons on the screen
+- [X] Deploy to GitHub Pages
 - [ ] Record gifs in the browser
