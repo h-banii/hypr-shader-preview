@@ -28,6 +28,16 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
+  const creditButtons = createElement({ classList: 'top right', children: [
+    createElement({
+      type: 'button',
+      innerText: ' h-banii/hypr-shader-preview',
+      onclick: function() {
+        window.open('https://github.com/h-banii/hypr-shader-preview');
+      }
+    }),
+  ]});
+
   const fileButtons = createElement({ classList: 'top left', children: [
     createElement({
       type: 'button',
@@ -133,6 +143,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     })
   ]});
 
+  document.body.append(creditButtons);
   document.body.append(fileButtons);
   document.body.append(screenshotButtons);
   document.body.append(recordingButtons);
