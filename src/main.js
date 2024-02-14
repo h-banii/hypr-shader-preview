@@ -28,7 +28,22 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
-  const shaderButtons = createElement({ classList: 'top left', children: [
+  const fileButtons = createElement({ classList: 'top left', children: [
+    createElement({
+      type: 'button',
+      innerText: ' load image',
+      onclick: function() {
+        askForFile()
+          .then(readFileAsDataURL)
+          .then(async ([filename, url]) => {
+            texture = await loadTexture(gl, url);
+            draw(gl, fragSrc, texture, animation)
+          })
+          .catch((e) => console.log(
+            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+          ))
+      }
+    }),
     createElement({
       type: 'button',
       innerText: ' load shader',
@@ -58,7 +73,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
 
   const recordingButtons = createElement({ classList: 'bottom left', children: [
     createElement({
-      classList: 'timestamp',
+      classList: 'button',
       innerText: '00:00',
       setup: self => {
         recorder.addEventListener('timestamp', e => {
@@ -111,9 +126,14 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
         })
       },
     }),
+    createElement({
+      classList: 'button',
+      style: 'display: inline-block',
+      innerText: '(this is low quality, see README for alternative)'
+    })
   ]});
 
-  document.body.append(shaderButtons);
+  document.body.append(fileButtons);
   document.body.append(screenshotButtons);
   document.body.append(recordingButtons);
 }
