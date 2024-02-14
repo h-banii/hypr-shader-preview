@@ -1,6 +1,6 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
-import { askForFile, screenshotCanvas, CanvasRecorder } from './file';
+import { askForFile, screenshotCanvas, CanvasRecorder, readFileAsText, readFileAsDataURL } from './file';
 import { doubleClick, queryParameters, generateFilename, createElement } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
@@ -23,19 +23,21 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   if (hide_buttons) 
     configureClickActions(gl, texture, animation, filename);
   else
-    configureButtonActions(gl, texture, animation, recorder, filename);
+    configureButtonActions(gl, fragSrc, texture, animation, recorder, filename);
   configureKeyboardActions(recorder, filename);
 }
 
-function configureButtonActions(gl, texture, animation, recorder, filename) {
-  const fileButtons = createElement({ classList: 'top left', children: [
+function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
+  const shaderButtons = createElement({ classList: 'top left', children: [
     createElement({
       type: 'button',
       innerText: ' load shader',
       onclick: function() {
         askForFile('frag')
-          .then(([filename, content]) => {
-            draw(gl, content, texture, animation)
+          .then(readFileAsText)
+          .then(([filename, src]) => {
+            fragSrc = src;
+            draw(gl, fragSrc, texture, animation)
           })
           .catch((e) => console.log(
             `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
@@ -111,7 +113,7 @@ function configureButtonActions(gl, texture, animation, recorder, filename) {
     }),
   ]});
 
-  document.body.append(fileButtons);
+  document.body.append(shaderButtons);
   document.body.append(screenshotButtons);
   document.body.append(recordingButtons);
 }
@@ -137,8 +139,9 @@ function configureClickActions(gl, texture, animation, filename) {
     screenshotCanvas(gl.canvas, filename());
   }, () => {
     askForFile('frag')
-      .then(([filename, content]) => {
-        draw(gl, content, texture, animation)
+      .then(readFileAsText)
+      .then(([filename, src]) => {
+        draw(gl, src, texture, animation)
       })
       .catch((e) => console.log(
         `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`

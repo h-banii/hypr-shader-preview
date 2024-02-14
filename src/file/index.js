@@ -16,11 +16,7 @@ export function askForFile(extension) {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = readerEvent => {
-        resolve([file.name, readerEvent.target.result]);
-      }
-      reader.readAsText(file,'UTF-8');
+      resolve(file);
     }
 
     input.oncancel = () => {
@@ -30,6 +26,24 @@ export function askForFile(extension) {
     input.click();
   });
 }
+
+export const readFileAsText = (file) => new Promise((resolve, reject) => { 
+  const reader = new FileReader();
+  reader.onload = readerEvent => {
+    resolve([file.name, readerEvent.target.result]);
+  }
+  reader.onerror = () => reject(reader.error)
+  reader.readAsText(file);
+});
+
+export const readFileAsDataURL = (file) => new Promise((resolve, reject) => { 
+  const reader = new FileReader();
+  reader.onload = readerEvent => {
+    resolve([file.name, readerEvent.target.result]);
+  }
+  reader.onerror = () => reject(reader.error)
+  reader.readAsDataURL(file);
+});
 
 function download(filename, url) {
   // https://stackoverflow.com/a/44487883
