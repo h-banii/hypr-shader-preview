@@ -40,7 +40,7 @@ html, body{
   left: 0;
 }
 
-button, .timestamp {
+button, .button {
   font-size: 14px;
   display: inline-block;
   border-radius: 8px;

@@ -74,7 +74,7 @@ npm start
 
 ### Buttons
 
-<image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/a84cf1ca-52b5-4039-8e32-c0e6df1d2585" />
+<image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/216bf852-e236-4ac9-8e10-cb8357ed7ef7" />
 
 ### Query parameters
 
