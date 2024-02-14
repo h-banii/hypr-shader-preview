@@ -1,5 +1,14 @@
+@font-face {
+  font-family: "MapleMono NF";
+  src: url("./fonts/MapleMono-NF-Regular.ttf");
+}
+
 canvas {
   position: absolute;
+}
+
+* {
+  font-family: MapleMono NF;
 }
 
 html, body{
@@ -9,4 +18,40 @@ html, body{
   height: 100%;
   overflow: hidden;
   background-color: black;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0;
+}
+
+.top {
+  position: absolute;
+  top: 0;
+}
+
+.right {
+  position: absolute;
+  right: 0;
+}
+
+.left {
+  position: absolute;
+  left: 0;
+}
+
+button, .timestamp {
+  font-size: 14px;
+  display: inline-block;
+  border-radius: 8px;
+  margin: 4px 2px;
+  padding: 8px 10px;
+  border: none;
+  color: white;
+  background-color: black;
+  font-size: 20px;
+}
+
+button:hover {
+  background-color: gray;
 }

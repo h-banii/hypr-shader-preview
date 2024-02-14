@@ -67,70 +67,28 @@ npm start
   ➜  press h + enter to show help
 ```
 
-By default it should display an unmodified image (default shader). To run a
-custom shader, do the following:
+By default it should display an unmodified image and a few buttons, which are
+auto-explicative:
 
-1) copy your shader to `src/public/shaders`
-2) open `http://localhost:5173?shader=YOUR_SHADER_NAME_HERE.frag`
-3) enjoy
+<details>
+  <summary>Preview</summary>
+  <image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/a84cf1ca-52b5-4039-8e32-c0e6df1d2585" />
+</details>
 
 ### Query parameters
 
-Configuration is done via optional query parameters
+Configuration can also be done via query parameters
 
 - shader: filename of the shader relative to `src/public/shaders/`
 - image: filename of the background image relative to `src/public/images/`
 - width: width in pixels of the canvas
 - height: height in pixels of the canvas
+- hide_buttons: hides buttons (useful if you want to record it on OBS, for example)
+- fps: changes fps used to record the canvas
 
 Here's an example using all of them:
 
-[http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080](http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080)
-
-<!-- ### shader -->
-<!---->
-<!-- This allows you to create a file named `you_shader.frag` inside `src/shaders` -->
-<!-- and access its preview on -->
-<!---->
-<!-- [http://localhost:5173?shader=your_shader.frag](http://localhost:5173?shader=your_shader.frag). -->
-<!---->
-<!-- ### image -->
-<!---->
-<!-- If you want to change the background image, just add an image to `src/images` -->
-<!-- and pass the filename through the query parameter -->
-<!---->
-<!-- [http://localhost:5173?image=your_image.jpg](http://localhost:5173?image=your_image.jpg). -->
-<!---->
-<!-- ### width and height -->
-<!---->
-<!-- This is useful if you want your preview to have a particular size, like -->
-<!-- 1920x1080 -->
-<!---->
-<!-- By default the canvas tries to occupy your browser window size, but it will not -->
-<!-- get dynamically resized if the window changes size after it has already loaded. -->
-<!-- (If you want the canvas size to update, just reload the page). -->
-<!---->
-<!-- [http://localhost:5173?width=1920&height=1080](http://localhost:5173?width=1920&height=1080). -->
-
-##  Take screenshots
-
-Just *click* it!
-
-The screenshot gets saved automatically to your browser's default download
-folder.
-
-## Load shaders not located in `src/shaders/`
-
-Just *double-click* it!
-
-It'll open a file input for you to select any fragment shader you want to load.
-If it fails, check the console log.
-
-## Recording
-
-Press R to start recording, press it again to stop, then press S to save it.
-
-Or use OBS, you can load it inside a *browser source*.
+[http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true&fps=60](http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true&fps=60)
 
 ## Version 3.00
 
@@ -142,6 +100,8 @@ So... this is a not very useful feature at the moment, but it's there.
 
 ## Limitations
 
+### Background image
+
 The background image is static. The shaders get applied to a static image, not
 to your current display, but that's fine because the goal is just to preview
 shaders not to apply it to your actual display. Also, you can just take a
@@ -150,15 +110,21 @@ screenshot of your desktop and use it as background image for the shaders.
 In the future I might try adding support for video files as background for the
 shader, but it's not priority.
 
-An interesting idea would be to record your screen on OBS with a display/window
-source then apply the shaders on it. But that requires creating an OBS plugin
-and it feels kinda overkill compared to this simple web page that works inside
-a regular browser...
+### Recording
+
+The built-in recorder has really low quality (w3c/mediacapture-record#57), but
+you can bypass that by simply using another screen recorder like OBS (load it
+inside a *browser source* and set the `hide_buttons` query parameter to true).
+
+An interesting idea that doesn't use WebGL would be to record your screen on
+OBS with a display/window source then apply the shaders on it. But that
+requires creating an OBS plugin and it feels kinda overkill compared to this
+simple web page that works inside a regular browser...
 
 # Goals
 
 - [X] Compile and run Hyprland shaders
 - [X] Take screenshots in the browser
 - [X] Record videos in the browser
-- [ ] Show buttons to take screenshots/record
+- [X] Show buttons on the screen
 - [ ] Record gifs in the browser
