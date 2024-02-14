@@ -31,7 +31,7 @@ export function loadTexture(gl, url) {
 
       resolve(texture);
     };
-    image,onerror = reject;
+    image.onerror = reject;
     image.src = url;
   });
 }
