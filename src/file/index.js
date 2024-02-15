@@ -216,8 +216,7 @@ mime: ${type}`
 }
 
 export class WebGLGifRecorder extends Recorder {
-  constructor(gl, fps, quality = 10) {
-    // const gif = GIFEncoder();
+  constructor(gl, fps, colors) {
     const width = gl.drawingBufferWidth;
     const height = gl.drawingBufferHeight;
     const length = width * height * 4;
@@ -252,7 +251,7 @@ export class WebGLGifRecorder extends Recorder {
     this.width = width;
     this.height = height;
     this.delay = delay;
-    this.colors = 256;
+    this.colors = colors;
   }
 
   async start() {

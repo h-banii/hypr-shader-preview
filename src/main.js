@@ -9,7 +9,7 @@ import vertex3Src from '/shaders/default3.vert?url&raw';
 async function main({
   shader, image, width, height,
   video_fps, video_mbps, video_mime,
-  gif_fps,
+  gif_fps, gif_colors,
   hide_buttons
 }) {
   console.log(`
@@ -17,10 +17,11 @@ shader: ${shader}
 image: ${image}
 width: ${width}
 height: ${height}
-video fps: ${video_fps}
-video mbps: ${video_mbps}
-video mime: ${video_mime}
-gif fps: ${gif_fps}
+video_fps: ${video_fps}
+video_mbps: ${video_mbps}
+video_mime: ${video_mime}
+gif_fps: ${gif_fps}
+gif_colors: ${gif_colors}
 hide_buttons: ${hide_buttons}
   `)
 
@@ -30,7 +31,7 @@ hide_buttons: ${hide_buttons}
   const texture = await loadTexture(gl, `./images/${image}`);
 
   const videoRecorder = new CanvasRecorder(gl.canvas, video_fps, video_mbps, video_mime);
-  const gifRecorder = new WebGLGifRecorder(gl, gif_fps);
+  const gifRecorder = new WebGLGifRecorder(gl, gif_fps, gif_colors);
   const animation = new Animation;
 
   try {
@@ -348,5 +349,6 @@ queryParameters(main, {
   "video_mbps": 26,
   "video_mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
   "gif_fps": 15,
+  "gif_colors": 256,
   "hide_buttons": false,
 })
