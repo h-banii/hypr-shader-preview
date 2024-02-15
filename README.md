@@ -85,6 +85,7 @@ npm start
 - hide_buttons: hides buttons (useful if you want to record it on OBS, for example)
 - fps: changes fps used to record the canvas
 - mbps: changes bitrate (mbps) used to record the canvas
+- mime: changes mime type used to record the canvas
 
 Here's an example using all of them:
 

@@ -98,8 +98,13 @@ class Timestamp {
 }
 
 export class CanvasRecorder extends EventTarget {
-  constructor(canvas, fps, mbps) {
+  constructor(canvas, fps, mbps, mime) {
     super();
+
+    const mimeIsSupported = MediaRecorder.isTypeSupported(mime);
+
+    if (!mimeIsSupported)
+      console.log(`Unsupported mime type: ${mime}`)
 
     this.fps = fps;
     this.mbps = mbps;
@@ -108,6 +113,7 @@ export class CanvasRecorder extends EventTarget {
     this.stream = canvas.captureStream(fps);
     this.recorder = new MediaRecorder(this.stream, {
       videoBitsPerSecond: mbps * 1e6,
+      mimeType: mimeIsSupported ? mime : '',
     });
     this.recording = false;
 
