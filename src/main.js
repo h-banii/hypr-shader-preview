@@ -1,7 +1,7 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
 import { askForFile, screenshotCanvas, CanvasRecorder, readFileAsText, readFileAsDataURL } from './file';
-import { doubleClick, queryParameters, generateFilename, createElement } from './utils';
+import { doubleClick, queryParameters, generateFilename, createElement, createInput } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
@@ -95,6 +95,13 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     }),
   ]});
 
+  const mimeTypeInput = createInput({
+    type: 'text',
+    classList: 'button',
+    size: "12",
+    value: 'video/mp4',
+  });
+
   const recordingButtons = createElement({ classList: 'bottom left', children: [
     createElement({
       classList: 'button',
@@ -116,45 +123,52 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     createElement({
       type: 'button',
       innerText: '◎ record',
-      onclick: function() {
-        if (recorder.recording) {
-          recorder.stop();
-        } else {
-          recorder.start();
-        }
-      },
       setup: self => {
+        self.onclick = function() {
+          if (recorder.recording) {
+            recorder.stop();
+            self.style.display = 'none';
+          } else {
+            recorder.start();
+          }
+        };
         recorder.addEventListener('recording', e => {
           self.innerText = e.detail ? '◉ stop' : '◎ record';
+        })
+        recorder.addEventListener('reset', e => {
+          self.style.display = '';
         })
       },
     }),
     createElement({
-      type: 'button',
-      innerText: 'save',
       style: 'display: none',
-      onclick: function() {
-        recorder.save(filename());
-      },
+      children: [
+        mimeTypeInput,
+        createElement({
+          type: 'button',
+          innerText: 'save',
+          onclick: function() {
+            recorder.save(filename(), mimeTypeInput.value);
+          },
+        }),
+        createElement({
+          type: 'button',
+          innerText: 'cancel',
+          onclick: function() {
+            recorder.reset();
+          },
+        }),
+      ],
       setup: self => {
         recorder.addEventListener('recording', e => {
-          const recording = e.detail;
-          if (!recording) {
-            self.style.display = '';
-          } else {
-            self.style.display = 'none';
-          }
+          if (!e.detail) self.style.display = 'inline-block';
+          else self.style.display = 'none';
         })
         recorder.addEventListener('reset', () => {
           self.style.display = 'none';
         })
       },
     }),
-    createElement({
-      classList: 'button',
-      style: 'display: inline-block',
-      innerText: '(this is low quality, see README for alternative)'
-    })
   ]});
 
   document.body.append(creditButtons);
