@@ -6,13 +6,13 @@ import { doubleClick, queryParameters, generateFilename, createElement } from '.
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps, hide_buttons }) {
+async function main({ shader, image, width, height, fps, mbps, hide_buttons }) {
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const recorder = new CanvasRecorder(gl.canvas, fps);
+  const recorder = new CanvasRecorder(gl.canvas, fps, mbps);
   const animation = new Animation;
 
   try {
@@ -265,5 +265,6 @@ queryParameters(main, {
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
   "fps" : 30,
+  "mbps": 26,
   "hide_buttons": false,
 })

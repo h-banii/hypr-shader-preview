@@ -98,15 +98,14 @@ class Timestamp {
 }
 
 export class CanvasRecorder extends EventTarget {
-  constructor(canvas, fps) {
+  constructor(canvas, fps, mbps) {
     super();
-
-    this.canvas = canvas;
-    this.fps = fps;
 
     this.chunks = [];
     this.stream = canvas.captureStream(fps);
-    this.recorder = new MediaRecorder(this.stream);
+    this.recorder = new MediaRecorder(this.stream, {
+      videoBitsPerSecond: mbps * 1e6,
+    });
     this.recording = false;
 
     this.timestamp = new Timestamp((time) => {
@@ -143,8 +142,8 @@ export class CanvasRecorder extends EventTarget {
     this.dispatchResetEvent();
   }
 
-  save(filename = 'hypr-shader-preview-video') {
-    const blob = new Blob(this.chunks, { 'type' : 'video/webm' });
+  save(filename = 'hypr-shader-preview-video', type = 'video/mp4') { 
+    const blob = new Blob(this.chunks, { 'type' : type });
     const url = URL.createObjectURL(blob);
     download(filename, url);
     this.reset();
