@@ -216,7 +216,7 @@ mime: ${type}`
 }
 
 export class WebGLGifRecorder extends Recorder {
-  constructor(gl, fps, colors) {
+  constructor(gl, fps, numColors, numWorkers) {
     const width = gl.drawingBufferWidth;
     const height = gl.drawingBufferHeight;
     const length = width * height * 4;
@@ -251,7 +251,8 @@ export class WebGLGifRecorder extends Recorder {
     this.width = width;
     this.height = height;
     this.delay = delay;
-    this.colors = colors;
+    this.numColors = numColors;
+    this.numWorkers = numWorkers;
   }
 
   async start() {
@@ -262,7 +263,7 @@ export class WebGLGifRecorder extends Recorder {
       final: null,
       promise: null,
       cache: null,
-      workers: Array.from({ length: 6 }, () =>
+      workers: Array.from({ length: this.numWorkers }, () =>
         new GIFEncoderWorker({type: 'module' })
       ),
     };
@@ -273,7 +274,7 @@ export class WebGLGifRecorder extends Recorder {
           width: this.width,
           height: this.height,
           delay: this.delay,
-          colors: this.colors,
+          colors: this.numColors,
         });
 
         worker.onmessage = e => {
@@ -291,7 +292,7 @@ export class WebGLGifRecorder extends Recorder {
     });
 
     this.jobs.add = (data, width, height, delay) => {
-      const worker = this.jobs.workers[this.jobs.total % this.jobs.workers.length];
+      const worker = this.jobs.workers[this.jobs.total % this.numWorkers];
 
       worker.postMessage([data, this.jobs.total++], [ data.buffer ])
     }
@@ -315,7 +316,8 @@ export class WebGLGifRecorder extends Recorder {
 filename: ${filename}
 fps: ${this.fps}
 frames: ${this.jobs.total}
-palette: ${this.colors} colors
+palette: ${this.numColors} colors
+web workers: ${this.numWorkers}
 resolution: ${this.width} x ${this.height}`
     )
 

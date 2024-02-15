@@ -107,6 +107,7 @@ npm start
 - video_mime: mime type used to record videos
 - gif_fps: fps used to record gifs
 - gif_colors: maximum number of colors used to record gifs
+- gif_workers: number of web workers used to encode the gif data
 - hide_buttons: hides buttons (useful if you want to record it on OBS, for example)
 
 Here's an example using some of them:
