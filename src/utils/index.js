@@ -67,3 +67,25 @@ export function createInput({ type = 'text', ...rest }) {
 
   return element;
 }
+
+/**
+ * Immediately does the requested action then waits a certain delay before
+ * acepting any new requests.
+ */
+export function holdup(delay = 1000) {
+  const hold = (function*() {
+    let time = null;
+    while (true) {
+      const action = yield;
+      if (!action) continue;
+
+      const now = new Date;
+      if (!!time && now - time < delay) continue;
+      time = now;
+
+      action();
+    }
+  })();
+  hold.next();
+  return hold;
+}
