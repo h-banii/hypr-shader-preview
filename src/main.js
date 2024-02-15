@@ -7,6 +7,17 @@ import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
 async function main({ shader, image, width, height, fps, mbps, mime, hide_buttons }) {
+  console.log(`
+shader: ${shader}
+image: ${image}
+width: ${width}
+height: ${height}
+fps: ${fps}
+mbps: ${mbps}
+mime: ${mime}
+hide_buttons: ${hide_buttons}
+  `)
+
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
