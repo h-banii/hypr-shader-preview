@@ -1,4 +1,5 @@
-import { Gif } from '../lib/gif';
+import { GIFEncoder } from '../lib/gif/gifenc.esm.js';
+import GIFEncoderWorker from '../lib/gif/worker.js?worker';
 
 export function askForFile(extension) {
   const input = document.createElement('input');
@@ -111,8 +112,8 @@ class Recorder extends EventTarget {
     console.log(
       `[${new Date().toLocaleString()}] Started recording`
     )
-    this.timestamp.start();
     this.reset();
+    this.timestamp.start();
     this.isRecording = true;
   }
 
@@ -208,42 +209,106 @@ export class CanvasRecorder extends Recorder {
 
 export class WebGLGifRecorder extends Recorder {
   constructor(gl, fps, quality = 10) {
-    const gif = new Gif({
-      workers: 4,
-      workerScript: './lib/gif/gif.worker.js',
-      width: gl.drawingBufferWidth,
-      height: gl.drawingBufferHeight,
-      quality: quality,
-    });
-
+    // const gif = GIFEncoder();
+    const width = gl.drawingBufferWidth;
+    const height = gl.drawingBufferHeight;
+    const length = width * height * 4;
+    const halfLength = length >> 1;
+    const row = width * 4;
+    const end = (height - 1) * row;
     const delay = 1/fps * 1e3;
 
     super(new Timestamp((time) => {
       this.dispatchTimestampEvent(time);
-      gif.addFrame(gl, { delay: delay, copy: true });
+
+      const data = new Uint8ClampedArray(length);
+
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+      for (let i = 0; i < halfLength; i += row) {
+        for (let j = 0; j < row; ++j) {
+          const tmp = data[i + j];
+          data[i + j] = data[end - i + j];
+          data[end - i + j] = tmp;
+        }
+      }
+
+      const worker = this.workers[this.frames.current % this.workers.length];
+
+      worker.postMessage({
+        data: data,
+        frame: this.frames.current++,
+        width: width,
+        height: height,
+        delay: delay,
+      }, [ data.buffer ])
+
     }, delay));
 
-    gif.on('finished', (blob) =>  {
-      download(this.filename, URL.createObjectURL(blob));
-      this.reset();
-    });
-
     this.fps = fps;
-    this.recorder = gif;
+    this.width = width;
+    this.height = height;
+    this.delay = delay;
+    this.gif = GIFEncoder({ auto: false });
+  }
+
+  start() {
+    this.frames = { current: 0, next: 0, finish: null };
+    this.workers = Array.from({ length: 6 }, () =>
+      new GIFEncoderWorker({type: 'module' })
+    );
+    this.workers.forEach(worker => {
+      worker.onmessage = e => {
+        const [data, frame] = e.data;
+        if (this.frames.next == frame) {
+          let frameData = data;
+          while (!!frameData) {
+            this.gif.stream.writeBytes(frameData);
+            frameData = this.frames[++this.frames.next];
+            delete this.frames[this.frames.next];
+          }
+        } else {
+          this.frames[frame] = data;
+        }
+        if (this.frames.next == this.frames.finish) {
+          this.gif.finish();
+          this.workers.forEach(w => w.terminate())
+          this.workers.length = 0;
+          this.hasFinishedEncoding = true;
+          this.dispatchEvent(new Event("finished"));
+        }
+      }
+    });
+    super.start();
+  }
+
+  stop() {
+    super.stop();
+    this.frames.finish = this.frames.current;    
+    this.gif.finish();
   }
 
   reset() {
     super.reset();
-    this.recorder.frames = [];
-    this.recorder.abort();
+    this.gif.reset();
+    this.gif.writeHeader();
   }
 
   save(filename) {
-    console.log(
-      `[${new Date().toLocaleString()}] Downloading recording: ${filename}; ${this.fps} fps;`
-    )
+    const save = () => {
+      console.log(
+        `[${new Date().toLocaleString()}] Downloading recording: ${filename}; ${this.fps} fps;`
+      )
+      const output = this.gif.bytesView();
+      const blob = new Blob([output], { 'type' : 'image/gif' });
+      const url = URL.createObjectURL(blob);
+      download(filename, url);
+    }
 
-    this.filename = filename;
-    this.recorder.render();
+    if (this.hasFinishedEncoding) {
+      save();
+    } else {
+      this.addEventListener("finished", save, {once : true});
+    }
   }
 }
