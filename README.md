@@ -84,6 +84,7 @@ npm start
 - height: height in pixels of the canvas
 - hide_buttons: hides buttons (useful if you want to record it on OBS, for example)
 - fps: changes fps used to record the canvas
+- mbps: changes bitrate (mbps) used to record the canvas
 
 Here's an example using all of them:
 
@@ -127,5 +128,4 @@ simple web page that works inside a regular browser...
 - [X] Record videos in the browser
 - [X] Show buttons on the screen
 - [X] Deploy to GitHub Pages
-- [ ] Record videos in high quality
 - [ ] Record gifs in the browser
