@@ -98,15 +98,23 @@ class Timestamp {
 }
 
 export class CanvasRecorder extends EventTarget {
-  constructor(canvas, fps) {
+  constructor(canvas, fps, mbps, mime) {
     super();
 
-    this.canvas = canvas;
+    const mimeIsSupported = MediaRecorder.isTypeSupported(mime);
+
+    if (!mimeIsSupported)
+      console.log(`Unsupported mime type: ${mime}`)
+
     this.fps = fps;
+    this.mbps = mbps;
 
     this.chunks = [];
     this.stream = canvas.captureStream(fps);
-    this.recorder = new MediaRecorder(this.stream);
+    this.recorder = new MediaRecorder(this.stream, {
+      videoBitsPerSecond: mbps * 1e6,
+      mimeType: mimeIsSupported ? mime : '',
+    });
     this.recording = false;
 
     this.timestamp = new Timestamp((time) => {
@@ -143,11 +151,13 @@ export class CanvasRecorder extends EventTarget {
     this.dispatchResetEvent();
   }
 
-  save(filename = 'hypr-shader-preview-video') {
-    const blob = new Blob(this.chunks, { 'type' : 'video/webm' });
+  save(filename = 'hypr-shader-preview-video', type = 'video/mp4') { 
+    console.log(
+      `[${new Date().toLocaleString()}] Downloading recording: ${this.fps} fps; ${this.mbps} mbps; ${type}`
+    )
+    const blob = new Blob(this.chunks, { 'type' : type });
     const url = URL.createObjectURL(blob);
     download(filename, url);
-    this.reset();
   }
 
   dispatchRecordingEvent(recording) {

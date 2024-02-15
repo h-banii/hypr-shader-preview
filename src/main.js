@@ -1,18 +1,29 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
 import { askForFile, screenshotCanvas, CanvasRecorder, readFileAsText, readFileAsDataURL } from './file';
-import { doubleClick, queryParameters, generateFilename, createElement } from './utils';
+import { doubleClick, queryParameters, generateFilename, createElement, createInput } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps, hide_buttons }) {
+async function main({ shader, image, width, height, fps, mbps, mime, hide_buttons }) {
+  console.log(`
+shader: ${shader}
+image: ${image}
+width: ${width}
+height: ${height}
+fps: ${fps}
+mbps: ${mbps}
+mime: ${mime}
+hide_buttons: ${hide_buttons}
+  `)
+
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const recorder = new CanvasRecorder(gl.canvas, fps);
+  const recorder = new CanvasRecorder(gl.canvas, fps, mbps, mime);
   const animation = new Animation;
 
   try {
@@ -26,11 +37,12 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
 
-  if (hide_buttons) 
+  if (hide_buttons) {
     configureClickActions(gl, texture, animation, filename);
-  else
+    configureKeyboardActions(recorder, filename);
+  } else {
     configureButtonActions(gl, fragSrc, texture, animation, recorder, filename);
-  configureKeyboardActions(recorder, filename);
+  }
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
@@ -95,6 +107,13 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     }),
   ]});
 
+  const mimeTypeInput = createInput({
+    type: 'text',
+    classList: 'button',
+    size: "12",
+    value: 'video/mp4',
+  });
+
   const recordingButtons = createElement({ classList: 'bottom left', children: [
     createElement({
       classList: 'button',
@@ -116,45 +135,52 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     createElement({
       type: 'button',
       innerText: '◎ record',
-      onclick: function() {
-        if (recorder.recording) {
-          recorder.stop();
-        } else {
-          recorder.start();
-        }
-      },
       setup: self => {
+        self.onclick = function() {
+          if (recorder.recording) {
+            recorder.stop();
+            self.style.display = 'none';
+          } else {
+            recorder.start();
+          }
+        };
         recorder.addEventListener('recording', e => {
           self.innerText = e.detail ? '◉ stop' : '◎ record';
+        })
+        recorder.addEventListener('reset', e => {
+          self.style.display = '';
         })
       },
     }),
     createElement({
-      type: 'button',
-      innerText: 'save',
       style: 'display: none',
-      onclick: function() {
-        recorder.save(filename());
-      },
+      children: [
+        mimeTypeInput,
+        createElement({
+          type: 'button',
+          innerText: 'save',
+          onclick: function() {
+            recorder.save(filename(), mimeTypeInput.value);
+          },
+        }),
+        createElement({
+          type: 'button',
+          innerText: 'cancel',
+          onclick: function() {
+            recorder.reset();
+          },
+        }),
+      ],
       setup: self => {
         recorder.addEventListener('recording', e => {
-          const recording = e.detail;
-          if (!recording) {
-            self.style.display = '';
-          } else {
-            self.style.display = 'none';
-          }
+          if (!e.detail) self.style.display = 'inline-block';
+          else self.style.display = 'none';
         })
         recorder.addEventListener('reset', () => {
           self.style.display = 'none';
         })
       },
     }),
-    createElement({
-      classList: 'button',
-      style: 'display: inline-block',
-      innerText: '(this is low quality, see README for alternative)'
-    })
   ]});
 
   document.body.append(creditButtons);
@@ -259,11 +285,15 @@ function initTextureSampler(gl, program, texture, unit=0) {
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
 
+const isFirefox = typeof InstallTrigger !== 'undefined';
+
 queryParameters(main, {
   "shader" : 'default.frag',
   "image"  : 'default.png',
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
   "fps" : 30,
+  "mbps": 26,
+  "mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
   "hide_buttons": false,
 })
