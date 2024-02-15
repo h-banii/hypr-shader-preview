@@ -6,12 +6,12 @@ You can try it out [here](https://h-banii.github.io/hypr-shader-preview/?shader=
 It allows you to easily debug, take screenshots, and record your shaders
 without having to load them into Hyprland.
 
-<img src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/6a28eb70-6e62-44c6-b09e-fc568a723755" width="800"/>
+<image width="800" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/e41789c4-6056-4e41-9b53-fffff41de129" />
 
-## Demo
+### Demo
 
 <details>
-  <summary>Sakura petals</summary>
+  <summary>Sakura petals video</summary>
   <p>
     <video src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/35cccd25-f6ae-46e5-a3bb-96112e3d35ff">
     </video>
@@ -23,7 +23,18 @@ without having to load them into Hyprland.
   </p>
 </details>
 
-## Supported variables
+<details>
+  <summary>Sakura petals gif</summary>
+  <p>
+    <img src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/92f9f9f6-573a-4ce0-9e12-ec68c9afcf27" width="800"/><br>
+    <em>
+      art: h-banii (<a href="https://twitter.com/h_banii">twitter</a>) (<a href="https://www.pixiv.net/en/users/56018062">pixiv</a>)
+    </em>
+  </p>
+</details>
+
+
+### Supported variables
 
 It uses the same variable names that Hyprland expects, so you *probably* don't
 need to modify your hyprland shaders, they're likely already compatible.
@@ -38,19 +49,19 @@ uniform float time
 uniform int wl_output
 ```
 
-## Debug shaders
+### Debug shaders
 
 Compilation errors are printed in the browser's console log.
 
-## Requirements
+# Requirements
 
 You need a browser with WebGL support and hardware acceleration activated (otherwise it'll use your CPU).
 
 If you wish to install and use it locally, you'll need [Node.js](https://nodejs.org/en).
 
-## Usage
+# Usage
 
-### GitHub Page
+### GitHub Pages
 
 Go to [https://h-banii.github.io/hypr-shader-preview](https://h-banii.github.io/hypr-shader-preview) and enjoy!
 
@@ -79,7 +90,11 @@ npm start
 
 ### Buttons
 
-<image width="400" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/216bf852-e236-4ac9-8e10-cb8357ed7ef7" />
+- load background image
+- load fragment shader (frag)
+- take screenshot (png)
+- record video (mp4, webm)
+- record gif
 
 ### Query parameters
 
@@ -87,14 +102,16 @@ npm start
 - image: filename of the background image relative to `src/public/images/`
 - width: width in pixels of the canvas
 - height: height in pixels of the canvas
+- video_fps: fps used to record videos
+- video_mbps: bitrate (mbps) used to record videos
+- video_mime: mime type used to record videos
+- gif_fps: fps used to record gifs
+- gif_colors: maximum number of colors used to record gifs
 - hide_buttons: hides buttons (useful if you want to record it on OBS, for example)
-- fps: changes fps used to record the canvas
-- mbps: changes bitrate (mbps) used to record the canvas
-- mime: changes mime type used to record the canvas
 
-Here's an example using all of them:
+Here's an example using some of them:
 
-[http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true&fps=60](http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true&fps=60)
+[http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true](http://localhost:5173?shader=sakura.frag&image=default.png&width=1920&height=1080&hide_buttons=true)
 
 ## Version 3.00
 
@@ -104,7 +121,7 @@ to support it, or maybe it needs some modification.
 
 So... this is a not very useful feature at the moment, but it's there.
 
-## Limitations
+# Limitations
 
 ### Background image
 
@@ -118,9 +135,9 @@ shader, but it's not priority.
 
 ### Recording
 
-The built-in recorder has really low quality (w3c/mediacapture-record#57), but
-you can bypass that by simply using another screen recorder like OBS (load it
-inside a *browser source* and set the `hide_buttons` query parameter to true).
+The built-in recorder is kinda bad, but that's not a big deal... you can use
+any third party screen recorder, like OBS, to record it (just set the
+`hide_buttons` query parameter to true and load it inside a *browser source*!).
 
 An interesting idea that doesn't use WebGL would be to record your screen on
 OBS with a display/window source then apply the shaders on it. But that
@@ -134,4 +151,4 @@ simple web page that works inside a regular browser...
 - [X] Record videos in the browser
 - [X] Show buttons on the screen
 - [X] Deploy to GitHub Pages
-- [ ] Record gifs in the browser
+- [X] Record gifs in the browser
