@@ -26,11 +26,12 @@ async function main({ shader, image, width, height, fps, mbps, hide_buttons }) {
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
 
-  if (hide_buttons) 
+  if (hide_buttons) {
     configureClickActions(gl, texture, animation, filename);
-  else
+    configureKeyboardActions(recorder, filename);
+  } else {
     configureButtonActions(gl, fragSrc, texture, animation, recorder, filename);
-  configureKeyboardActions(recorder, filename);
+  }
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
