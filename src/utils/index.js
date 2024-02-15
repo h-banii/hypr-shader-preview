@@ -44,12 +44,6 @@ export const generateFilename = function(prefix, ...parameters) {
   return filename;
 }
 
-export function createButton(container) {
-  const element = document.createElement('button');
-  if (container) container.appendChild(element);
-  return element;
-}
-
 export function createElement({ type = 'div', children = [], setup = () => {}, ...rest }) {
   const element = document.createElement(type);
 
@@ -62,6 +56,14 @@ export function createElement({ type = 'div', children = [], setup = () => {}, .
   }
 
   setup(element);
+
+  return element;
+}
+
+export function createInput({ type = 'text', ...rest }) {
+  const element = createElement({ type: 'input', ...rest });
+
+  element.type = type;
 
   return element;
 }
