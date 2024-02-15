@@ -157,8 +157,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
           type: 'button',
           innerText: 'save',
           onclick: function() {
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip it on vertex shader
-            gifRecorder.save(filename() + 'gif');
+            gifRecorder.save(filename());
           },
         }),
         createElement({
