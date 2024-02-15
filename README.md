@@ -29,14 +29,14 @@ It uses the same variable names that Hyprland expects, so you *probably* don't
 need to modify your hyprland shaders, they're likely already compatible.
 
 ```glsl
+// Supported
 varying vec2 v_texcoord
 uniform sampler2D tex
 uniform float time
-```
 
-I'm not sure what other variables Hyprland supports, but those 3 seems to be
-enough to run all shaders I've seen so far. Open an issue if you know another
-variable, I'll look into it.
+// Not supported, but planning to add
+uniform int wl_output
+```
 
 ## Debug shaders
 
