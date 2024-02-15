@@ -42,16 +42,21 @@ uniform int wl_output
 
 Compilation errors are printed in the browser's console log.
 
+## Requirements
+
+You need a browser with WebGL support and hardware acceleration activated (otherwise it'll use your CPU).
+
+If you wish to install and use it locally, you'll need [Node.js](https://nodejs.org/en).
+
 ## Usage
 
-### Quick start
+### GitHub Page
 
 Go to [https://h-banii.github.io/hypr-shader-preview](https://h-banii.github.io/hypr-shader-preview) and enjoy!
 
-### For developers (preferred)
+### Locally (preferred)
 
 To get started, clone the repository and install the dependencies.
-The only requirement is [Node.js](https://nodejs.org/en)
 
 ```sh
 git clone https://github.com/h-banii/hypr-shader-preview.git
