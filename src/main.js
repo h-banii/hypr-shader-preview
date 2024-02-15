@@ -6,13 +6,13 @@ import { doubleClick, queryParameters, generateFilename, createElement, createIn
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps, mbps, hide_buttons }) {
+async function main({ shader, image, width, height, fps, mbps, mime, hide_buttons }) {
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const recorder = new CanvasRecorder(gl.canvas, fps, mbps);
+  const recorder = new CanvasRecorder(gl.canvas, fps, mbps, mime);
   const animation = new Animation;
 
   try {
@@ -274,6 +274,8 @@ function initTextureSampler(gl, program, texture, unit=0) {
   gl.uniform1i(gl.getUniformLocation(program, "tex"), unit);
 }
 
+const isFirefox = typeof InstallTrigger !== 'undefined';
+
 queryParameters(main, {
   "shader" : 'default.frag',
   "image"  : 'default.png',
@@ -281,5 +283,6 @@ queryParameters(main, {
   "height" : window.innerHeight,
   "fps" : 30,
   "mbps": 26,
+  "mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
   "hide_buttons": false,
 })
