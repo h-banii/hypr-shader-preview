@@ -67,7 +67,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
   const fileButtons = createElement({ classList: 'top left', children: [
     createElement({
       type: 'button',
-      innerText: ' load image',
+      innerText: ' load image',
       onclick: function() {
         askForFile()
           .then(readFileAsDataURL)
