@@ -1,25 +1,29 @@
 import { GIFEncoder, quantize, applyPalette } from './gifenc.esm.js';
 
 self.addEventListener('message', (e) => {
-  const { frame, data, width, height, delay } = e.data;
+  const { width, height, delay, colors } = e.data;
 
-  // Quantize your colors to a 256-color RGB palette palette
-  const palette = quantize(data, 256);
+  self.addEventListener('message', (e) => {
+    const [ data, frame ] = e.data;
 
-  // Get an indexed bitmap by reducing each pixel to the nearest color palette
-  const index = applyPalette(data, palette);
+    // Quantize your colors to a 256-color RGB palette palette
+    const palette = quantize(data, colors);
 
-  // Encode into a single GIF frame chunk
-  const gif = GIFEncoder({ auto: false });
+    // Get an indexed bitmap by reducing each pixel to the nearest color palette
+    const index = applyPalette(data, palette);
 
-  // Write a single frame
-  gif.writeFrame(index, width, height, {
-    first: frame === 0,
-    repeat: 0,
-    palette: palette,
-    delay: delay,
+    // Encode into a single GIF frame chunk
+    const gif = GIFEncoder({ auto: false });
+
+    // Write a single frame
+    gif.writeFrame(index, width, height, {
+      first: frame === 0,
+      repeat: 0,
+      palette: palette,
+      delay: delay,
+    });
+
+    const output = gif.bytesView();
+    self.postMessage([ output, frame ], [output.buffer]);
   });
-
-  const output = gif.bytesView();
-  self.postMessage([ output, frame ], [output.buffer]);
-})
+}, { once: true })
