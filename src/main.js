@@ -15,7 +15,13 @@ async function main({ shader, image, width, height, fps, hide_buttons }) {
   const recorder = new CanvasRecorder(gl.canvas, fps);
   const animation = new Animation;
 
-  draw(gl, fragSrc, texture, animation);
+  try {
+    draw(gl, fragSrc, texture, animation);
+  } catch(e) {
+    console.log(
+      `[${new Date().toLocaleString()}] Failed to load shader.`
+    );
+  }
 
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
@@ -48,7 +54,11 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
           .then(async ([filename, url]) => {
             texture = await loadTexture(gl, url);
             draw(gl, fragSrc, texture, animation)
+            return filename;
           })
+          .then((filename) => console.log(
+            `[${new Date().toLocaleString()}] Loaded background image: ${filename}`
+          ))
           .catch((e) => console.log(
             `[${new Date().toLocaleString()}] Failed to load background image: ${e}`
           ))
@@ -63,7 +73,11 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
           .then(([filename, src]) => {
             fragSrc = src;
             draw(gl, fragSrc, texture, animation)
+            return filename;
           })
+          .then((filename) => console.log(
+            `[${new Date().toLocaleString()}] Loaded fragment shader: ${filename}`
+          ))
           .catch((e) => console.log(
             `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
           ))
