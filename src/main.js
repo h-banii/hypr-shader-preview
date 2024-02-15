@@ -6,15 +6,21 @@ import { doubleClick, queryParameters, generateFilename, createElement, createIn
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps, mbps, mime, hide_buttons }) {
+async function main({
+  shader, image, width, height,
+  video_fps, video_mbps, video_mime,
+  gif_fps,
+  hide_buttons
+}) {
   console.log(`
 shader: ${shader}
 image: ${image}
 width: ${width}
 height: ${height}
-fps: ${fps}
-mbps: ${mbps}
-mime: ${mime}
+video fps: ${video_fps}
+video mbps: ${video_mbps}
+video mime: ${video_mime}
+gif fps: ${gif_fps}
 hide_buttons: ${hide_buttons}
   `)
 
@@ -23,8 +29,8 @@ hide_buttons: ${hide_buttons}
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const videoRecorder = new CanvasRecorder(gl.canvas, fps, mbps, mime);
-  const gifRecorder = new WebGLGifRecorder(gl, fps);
+  const videoRecorder = new CanvasRecorder(gl.canvas, video_fps, video_mbps, video_mime);
+  const gifRecorder = new WebGLGifRecorder(gl, gif_fps);
   const animation = new Animation;
 
   try {
@@ -338,8 +344,9 @@ queryParameters(main, {
   "image"  : 'default.png',
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
-  "fps" : 30,
-  "mbps": 26,
-  "mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
+  "video_fps" : 30,
+  "video_mbps": 26,
+  "video_mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
+  "gif_fps": 15,
   "hide_buttons": false,
 })
