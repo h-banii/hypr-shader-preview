@@ -127,4 +127,5 @@ simple web page that works inside a regular browser...
 - [X] Record videos in the browser
 - [X] Show buttons on the screen
 - [X] Deploy to GitHub Pages
+- [ ] Record videos in high quality
 - [ ] Record gifs in the browser
