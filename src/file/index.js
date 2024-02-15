@@ -101,6 +101,9 @@ export class CanvasRecorder extends EventTarget {
   constructor(canvas, fps, mbps) {
     super();
 
+    this.fps = fps;
+    this.mbps = mbps;
+
     this.chunks = [];
     this.stream = canvas.captureStream(fps);
     this.recorder = new MediaRecorder(this.stream, {
@@ -143,10 +146,12 @@ export class CanvasRecorder extends EventTarget {
   }
 
   save(filename = 'hypr-shader-preview-video', type = 'video/mp4') { 
+    console.log(
+      `[${new Date().toLocaleString()}] Downloading recording: ${this.fps} fps; ${this.mbps} mbps; ${type}`
+    )
     const blob = new Blob(this.chunks, { 'type' : type });
     const url = URL.createObjectURL(blob);
     download(filename, url);
-    this.reset();
   }
 
   dispatchRecordingEvent(recording) {
