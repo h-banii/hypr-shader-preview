@@ -1,20 +1,28 @@
 import { loadShader, loadTexture, createShader, createProgram, createContext } from './webgl';
 import { Animation } from './animation';
-import { askForFile, screenshotCanvas, CanvasRecorder, readFileAsText, readFileAsDataURL } from './file';
+import { askForFile, screenshotCanvas, CanvasRecorder, WebGLGifRecorder, readFileAsText, readFileAsDataURL } from './file';
 import { doubleClick, queryParameters, generateFilename, createElement, createInput } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
-async function main({ shader, image, width, height, fps, mbps, mime, hide_buttons }) {
+async function main({
+  shader, image, width, height,
+  video_fps, video_mbps, video_mime,
+  gif_fps, gif_colors, gif_workers,
+  hide_buttons
+}) {
   console.log(`
 shader: ${shader}
 image: ${image}
 width: ${width}
 height: ${height}
-fps: ${fps}
-mbps: ${mbps}
-mime: ${mime}
+video_fps: ${video_fps}
+video_mbps: ${video_mbps}
+video_mime: ${video_mime}
+gif_fps: ${gif_fps}
+gif_colors: ${gif_colors}
+gif_workers: ${gif_workers}
 hide_buttons: ${hide_buttons}
   `)
 
@@ -23,7 +31,8 @@ hide_buttons: ${hide_buttons}
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const recorder = new CanvasRecorder(gl.canvas, fps, mbps, mime);
+  const videoRecorder = new CanvasRecorder(gl.canvas, video_fps, video_mbps, video_mime);
+  const gifRecorder = new WebGLGifRecorder(gl, gif_fps, gif_colors, gif_workers);
   const animation = new Animation;
 
   try {
@@ -41,11 +50,11 @@ hide_buttons: ${hide_buttons}
     configureClickActions(gl, texture, animation, filename);
     configureKeyboardActions(recorder, filename);
   } else {
-    configureButtonActions(gl, fragSrc, texture, animation, recorder, filename);
+    configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename);
   }
 }
 
-function configureButtonActions(gl, fragSrc, texture, animation, recorder, filename) {
+function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename) {
   const creditButtons = createElement({ classList: 'top right', children: [
     createElement({
       type: 'button',
@@ -59,7 +68,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
   const fileButtons = createElement({ classList: 'top left', children: [
     createElement({
       type: 'button',
-      innerText: ' load image',
+      innerText: ' load image',
       onclick: function() {
         askForFile()
           .then(readFileAsDataURL)
@@ -107,6 +116,78 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     }),
   ]});
 
+  const timestampDisplay = (recorder) => createElement({
+    classList: 'button',
+    innerText: '00:00',
+    setup: self => {
+      recorder.addEventListener('timestamp', e => {
+        if (self.style.display == 'none') self.style.display = `inline-block`;
+        self.innerText = new Date(e.detail).toLocaleString('en-GB', {
+          minute: '2-digit',
+          second: '2-digit',
+          timezone: 'UTC'
+        });
+      })
+      recorder.addEventListener('reset', () => {
+        self.innerText = '00:00';
+      })
+    },
+  });
+
+  const recordButton = (recorder, type = '') => createElement({
+    type: 'button',
+    innerText: `◎ record ${type}`,
+    setup: self => {
+      self.onclick = function() {
+        if (recorder.isRecording) {
+          recorder.stop();
+          self.style.display = 'none';
+        } else {
+          recorder.start();
+        }
+      };
+      recorder.addEventListener('recording', e => {
+        self.innerText = e.detail ? '◉ stop ' : '◎ record ' + type;
+      })
+      recorder.addEventListener('reset', e => {
+        self.style.display = '';
+      })
+    },
+  });
+
+  const gifButtons = createElement({ children: [
+    timestampDisplay(gifRecorder),
+    recordButton(gifRecorder, 'gif'),
+    createElement({
+      style: 'display: none',
+      children: [
+        createElement({
+          type: 'button',
+          innerText: 'save',
+          onclick: function() {
+            gifRecorder.save(filename());
+          },
+        }),
+        createElement({
+          type: 'button',
+          innerText: 'cancel',
+          onclick: function() {
+            gifRecorder.reset();
+          },
+        }),
+      ],
+      setup: self => {
+        gifRecorder.addEventListener('recording', e => {
+          if (!e.detail) self.style.display = 'inline-block';
+          else self.style.display = 'none';
+        })
+        gifRecorder.addEventListener('reset', () => {
+          self.style.display = 'none';
+        })
+      },
+    }),
+  ]});
+
   const mimeTypeInput = createInput({
     type: 'text',
     classList: 'button',
@@ -114,44 +195,9 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
     value: 'video/mp4',
   });
 
-  const recordingButtons = createElement({ classList: 'bottom left', children: [
-    createElement({
-      classList: 'button',
-      innerText: '00:00',
-      setup: self => {
-        recorder.addEventListener('timestamp', e => {
-          if (self.style.display == 'none') self.style.display = `inline-block`;
-          self.innerText = new Date(e.detail).toLocaleString('en-GB', {
-            minute: '2-digit',
-            second: '2-digit',
-            timezone: 'UTC'
-          });
-        })
-        recorder.addEventListener('reset', () => {
-          self.innerText = '00:00';
-        })
-      },
-    }),
-    createElement({
-      type: 'button',
-      innerText: '◎ record',
-      setup: self => {
-        self.onclick = function() {
-          if (recorder.recording) {
-            recorder.stop();
-            self.style.display = 'none';
-          } else {
-            recorder.start();
-          }
-        };
-        recorder.addEventListener('recording', e => {
-          self.innerText = e.detail ? '◉ stop' : '◎ record';
-        })
-        recorder.addEventListener('reset', e => {
-          self.style.display = '';
-        })
-      },
-    }),
+  const videoButtons = createElement({ children: [
+    timestampDisplay(videoRecorder),
+    recordButton(videoRecorder, 'video'),
     createElement({
       style: 'display: none',
       children: [
@@ -160,28 +206,36 @@ function configureButtonActions(gl, fragSrc, texture, animation, recorder, filen
           type: 'button',
           innerText: 'save',
           onclick: function() {
-            recorder.save(filename(), mimeTypeInput.value);
+            videoRecorder.save(filename(), mimeTypeInput.value);
           },
         }),
         createElement({
           type: 'button',
           innerText: 'cancel',
           onclick: function() {
-            recorder.reset();
+            videoRecorder.reset();
           },
         }),
       ],
       setup: self => {
-        recorder.addEventListener('recording', e => {
+        videoRecorder.addEventListener('recording', e => {
           if (!e.detail) self.style.display = 'inline-block';
           else self.style.display = 'none';
         })
-        recorder.addEventListener('reset', () => {
+        videoRecorder.addEventListener('reset', () => {
           self.style.display = 'none';
         })
       },
     }),
   ]});
+
+  const recordingButtons = createElement({
+    classList: 'bottom left',
+    children: [
+      gifButtons,
+      videoButtons,
+    ],
+  }); 
 
   document.body.append(creditButtons);
   document.body.append(fileButtons);
@@ -257,7 +311,7 @@ function initSquareBuffer(gl, program) {
     0.0, 1.0,
     0.0, 0.0,
     1.0, 0.0
-  ];
+  ].reverse();
 
   const aPositionLocation = gl.getAttribLocation(program, "a_position");
   const numComponents = 2;
@@ -292,8 +346,11 @@ queryParameters(main, {
   "image"  : 'default.png',
   "width"  : window.innerWidth,
   "height" : window.innerHeight,
-  "fps" : 30,
-  "mbps": 26,
-  "mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
+  "video_fps" : 30,
+  "video_mbps": 26,
+  "video_mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
+  "gif_fps": 15,
+  "gif_colors": 256,
+  "gif_workers": 6,
   "hide_buttons": false,
 })
