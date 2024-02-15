@@ -97,9 +97,69 @@ class Timestamp {
   }
 }
 
-export class CanvasRecorder extends EventTarget {
-  constructor(canvas, fps, mbps, mime) {
+class Recorder extends EventTarget {
+  #isRecording = false;
+
+  constructor(timestamp) {
     super();
+    this.timestamp = timestamp;
+  }
+
+  start() {
+    console.log(
+      `[${new Date().toLocaleString()}] Started recording`
+    )
+    this.timestamp.start();
+    this.reset();
+    this.isRecording = true;
+  }
+
+  stop() {
+    console.log(
+      `[${new Date().toLocaleString()}] Stopped recording`
+    )
+    this.isRecording = false;
+    this.timestamp.stop();
+  }
+
+  reset() {
+    this.timestamp.reset();
+    this.dispatchResetEvent();
+  }
+
+  /** @abstract */
+  save() {}
+
+  get isRecording() {
+    return this.#isRecording;
+  }
+
+  set isRecording(value) {
+    this.#isRecording = value;
+    this.dispatchRecordingEvent(this.recording);
+  }
+
+  dispatchRecordingEvent(recording) {
+    const event = new CustomEvent("recording", { detail: recording || this.isRecording });
+    this.dispatchEvent(event);
+  }
+
+  dispatchTimestampEvent(timestamp) {
+    const event = new CustomEvent("timestamp", { detail: timestamp });
+    this.dispatchEvent(event);
+  }
+
+  dispatchResetEvent() {
+    const event = new Event("reset");
+    this.dispatchEvent(event);
+  }
+}
+
+export class CanvasRecorder extends Recorder {
+  constructor(canvas, fps, mbps, mime) {
+    super(new Timestamp((time) => {
+      this.dispatchTimestampEvent(time)
+    }));
 
     const mimeIsSupported = MediaRecorder.isTypeSupported(mime);
 
@@ -115,63 +175,31 @@ export class CanvasRecorder extends EventTarget {
       videoBitsPerSecond: mbps * 1e6,
       mimeType: mimeIsSupported ? mime : '',
     });
-    this.recording = false;
-
-    this.timestamp = new Timestamp((time) => {
-      this.dispatchTimestampEvent(time)
-    });
 
     this.recorder.ondataavailable = (e) => this.chunks.push(e.data);
   }
 
   start() {
-    console.log(
-      `[${new Date().toLocaleString()}] Started recording`
-    )
-    this.reset();
+    super.start();
     this.recorder.start();
-    this.timestamp.start();
-    this.recording = true;
-    this.dispatchRecordingEvent(this.recording);
   }
 
   stop() {
-    console.log(
-      `[${new Date().toLocaleString()}] Stopped recording`
-    )
+    super.stop();
     this.recorder.stop();
-    this.timestamp.stop();
-    this.recording = false;
-    this.dispatchRecordingEvent(this.recording);
   }
 
   reset() {
+    super.reset();
     this.chunks = [];
-    this.timestamp.reset();
-    this.dispatchResetEvent();
   }
 
   save(filename = 'hypr-shader-preview-video', type = 'video/mp4') { 
     console.log(
-      `[${new Date().toLocaleString()}] Downloading recording: ${this.fps} fps; ${this.mbps} mbps; ${type}`
+      `[${new Date().toLocaleString()}] Downloading recording: ${filename}; ${this.fps} fps; ${this.mbps} mbps; ${type}`
     )
     const blob = new Blob(this.chunks, { 'type' : type });
     const url = URL.createObjectURL(blob);
     download(filename, url);
-  }
-
-  dispatchRecordingEvent(recording) {
-    const event = new CustomEvent("recording", { detail: recording });
-    this.dispatchEvent(event);
-  }
-
-  dispatchTimestampEvent(timestamp) {
-    const event = new CustomEvent("timestamp", { detail: timestamp });
-    this.dispatchEvent(event);
-  }
-
-  dispatchResetEvent() {
-    const event = new Event("reset");
-    this.dispatchEvent(event);
   }
 }
