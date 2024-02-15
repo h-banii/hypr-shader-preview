@@ -1,3 +1,5 @@
+import { Gif } from '../lib/gif';
+
 export function askForFile(extension) {
   const input = document.createElement('input');
   input.type = 'file';
@@ -201,5 +203,47 @@ export class CanvasRecorder extends Recorder {
     const blob = new Blob(this.chunks, { 'type' : type });
     const url = URL.createObjectURL(blob);
     download(filename, url);
+  }
+}
+
+export class WebGLGifRecorder extends Recorder {
+  constructor(gl, fps, quality = 10) {
+    const gif = new Gif({
+      workers: 4,
+      workerScript: './lib/gif/gif.worker.js',
+      width: gl.drawingBufferWidth,
+      height: gl.drawingBufferHeight,
+      quality: quality,
+    });
+
+    const delay = 1/fps * 1e3;
+
+    super(new Timestamp((time) => {
+      this.dispatchTimestampEvent(time);
+      gif.addFrame(gl, { delay: delay, copy: true });
+    }, delay));
+
+    gif.on('finished', (blob) =>  {
+      download(this.filename, URL.createObjectURL(blob));
+      this.reset();
+    });
+
+    this.fps = fps;
+    this.recorder = gif;
+  }
+
+  reset() {
+    super.reset();
+    this.recorder.frames = [];
+    this.recorder.abort();
+  }
+
+  save(filename) {
+    console.log(
+      `[${new Date().toLocaleString()}] Downloading recording: ${filename}; ${this.fps} fps;`
+    )
+
+    this.filename = filename;
+    this.recorder.render();
   }
 }
