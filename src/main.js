@@ -6,6 +6,23 @@ import { doubleClick, queryParameters, generateFilename, createElement, createIn
 import vertexSrc from '/shaders/default.vert?url&raw';
 import vertex3Src from '/shaders/default3.vert?url&raw';
 
+const Logger = new EventTarget;
+Logger.messages = [];
+
+// https://stackoverflow.com/a/11403146
+(function() {
+  const log = console.log;
+  console.log = function () {
+    const message = [
+      `[${new Date().toLocaleString(undefined, { hour: '2-digit', minute: '2-digit' })}]`,
+      ...arguments
+    ]
+    Logger.messages.push(message);
+    Logger.dispatchEvent(new MessageEvent("message", { data: message }));
+    log.apply(console, message);
+  };
+})();
+
 async function main({
   shader, image, width, height,
   video_fps, video_mbps, video_mime,
