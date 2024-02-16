@@ -31,7 +31,9 @@ export function loadTexture(gl, url) {
 
       resolve(texture);
     };
-    image.onerror = reject;
+    image.onerror = () => {
+      reject('probably not an image');
+    }
     image.src = url;
   });
 }

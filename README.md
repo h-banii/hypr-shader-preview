@@ -6,7 +6,7 @@ You can try it out [here](https://h-banii.github.io/hypr-shader-preview/?shader=
 It allows you to easily debug, take screenshots, and record your shaders
 without having to load them into Hyprland.
 
-<image width="800" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/e41789c4-6056-4e41-9b53-fffff41de129" />
+<image width="800" src="https://github.com/h-banii/hypr-shader-preview/assets/121690516/d54046a7-b876-4a38-8c06-9b2602164270" />
 
 ### Demo
 
