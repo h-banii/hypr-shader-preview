@@ -28,9 +28,11 @@ export function createShader(gl, type, source) {
 
   const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
   if (success) return shader;
- 
-  console.log(gl.getShaderInfoLog(shader));
+
+  const error = gl.getShaderInfoLog(shader);
   gl.deleteShader(shader);
+
+  throw new Error(`\n${error.slice(0, error.length - 2)}`);
 }
 
 export function createProgram(gl, vertexShader, fragmentShader) {
