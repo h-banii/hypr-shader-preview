@@ -55,18 +55,7 @@ hide_buttons: ${hide_buttons}`
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename) {
-  const creditButtons = createElement({ classList: 'top right', style: 'width: 550px;', children: [
-    createElement({
-      type: 'button',
-      innerText: ' h-banii/hypr-shader-preview',
-      style: `
-        display: block;
-        width: inherit;
-      `,
-      onclick: function() {
-        window.open('https://github.com/h-banii/hypr-shader-preview');
-      }
-    }),
+  const creditButtons = createElement({ classList: 'bottom right', style: 'width: 550px;', children: [
     createElement({
       classList: 'button',
       style: `
@@ -101,7 +90,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
         }),
         createElement({
           type: 'button',
-          innerText: '',
+          innerText: '',
           style: `
             background: transparent;
             position: absolute;
@@ -114,12 +103,23 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
             let toggle = false;
             self.onclick = () => {
               self.parentNode.style.maxHeight = toggle ? '200px' : '34px';
-              self.innerText = toggle ? '' : '';
+              self.innerText = toggle ? '' : '';
               toggle = !toggle;
             }
           }
         })
       ],
+    }),
+    createElement({
+      type: 'button',
+      innerText: ' h-banii/hypr-shader-preview',
+      style: `
+        display: block;
+        width: inherit;
+      `,
+      onclick: function() {
+        window.open('https://github.com/h-banii/hypr-shader-preview');
+      }
     }),
   ]});
 
@@ -162,7 +162,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
     }),
   ]});
 
-  const screenshotButtons = createElement({ classList: 'bottom right', children: [
+  const screenshotButtons = createElement({ classList: 'top right', children: [
     createElement({
       type: 'button',
       innerText: ' screenshot',
