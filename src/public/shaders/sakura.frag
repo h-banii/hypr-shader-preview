@@ -66,7 +66,7 @@ vec3 screen_blend_mode(vec3 top, vec3 bottom) {
 
 void main() {
   vec2 uv = v_texcoord;
-  vec3 color = texture2D(tex, v_texcoord).xyz;
+  vec4 pixel = texture2D(tex, v_texcoord);
   vec3 canvas = vec3(0.0, 0.0, 0.0);
 
   for (float i = 0.0; i < SAKURA_LAYERS; i++) {
@@ -89,7 +89,8 @@ void main() {
     );
 
     canvas += vec3(petals, petals, petals);
+    pixel.w = max(pixel.w, petals);
   }
 
-  gl_FragColor = vec4(screen_blend_mode(canvas * COLOR * OPACITY, color), 1.0);
+  gl_FragColor = vec4(screen_blend_mode(canvas * COLOR * OPACITY, pixel.xyz), pixel.w);
 }
