@@ -3,6 +3,8 @@ import { GIFEncoder, quantize, applyPalette } from './gifenc.esm.js';
 self.addEventListener('message', (e) => {
   const { width, height, delay, colors } = e.data;
 
+  const gif = GIFEncoder({ auto: false });
+
   self.addEventListener('message', (e) => {
     const [ data, frame ] = e.data;
 
@@ -12,8 +14,7 @@ self.addEventListener('message', (e) => {
     // Get an indexed bitmap by reducing each pixel to the nearest color palette
     const index = applyPalette(data, palette);
 
-    // Encode into a single GIF frame chunk
-    const gif = GIFEncoder({ auto: false });
+    gif.reset();
 
     // Write a single frame
     gif.writeFrame(index, width, height, {
