@@ -164,14 +164,26 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
         createElement({
           type: 'button',
           innerText: 'save',
-          onclick: function() {
-            gifRecorder.save(filename());
+          setup: self => {
+            self.onclick = function() {
+              self.disabled = true;
+              self.innerText = '...';
+              gifRecorder.save(filename())
+                .then(() => {
+                  self.disabled = false;
+                  self.innerText = 'save';
+                })
+                .catch(() => {
+                  console.log('canceled')
+                });
+            };
           },
         }),
         createElement({
           type: 'button',
           innerText: 'cancel',
           onclick: function() {
+            gifRecorder.cancel();
             gifRecorder.reset();
           },
         }),
