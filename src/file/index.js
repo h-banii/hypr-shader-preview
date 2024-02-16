@@ -253,22 +253,38 @@ export class WebGLGifRecorder extends Recorder {
     this.delay = delay;
     this.numColors = numColors;
     this.numWorkers = numWorkers;
-  }
 
-  async start() {
     this.jobs = {
       total: 0,
       done: 0,
       frames: [],
       final: null,
       promise: null,
+      cancel: () => {},
       cache: null,
-      workers: Array.from({ length: this.numWorkers }, () =>
-        new GIFEncoderWorker({type: 'module' })
-      ),
+      workers: null,
     };
+  }
+
+  async start() {
+    this.jobs.total = this.jobs.done = 0;
+    this.jobs.final = this.jobs.cache = this.jobs.promise = null;
+    this.jobs.frames = [];
+    this.jobs.workers = Array.from({ length: this.numWorkers }, () =>
+      new GIFEncoderWorker({type: 'module' })
+    );
 
     this.jobs.promise = new Promise((resolve, reject) => {
+      const terminate = () => {
+        this.jobs.workers.forEach(w => w.terminate())
+        this.jobs.workers.length = 0;
+      }
+
+      this.jobs.cancel = () => {
+        terminate();
+        reject();
+      }
+
       this.jobs.workers.forEach(worker => {
         worker.postMessage({
           width: this.width,
@@ -283,13 +299,12 @@ export class WebGLGifRecorder extends Recorder {
           this.jobs.frames[frame] = data;
 
           if (++this.jobs.done == this.jobs.final) {
-            this.jobs.workers.forEach(w => w.terminate())
-            this.jobs.workers.length = 0;
+            terminate();
             resolve(this.jobs.frames);
           }
         };
       });
-    });
+    }).catch(() => console.log('gif encoding has been cancelled.'));
 
     this.jobs.add = (data, width, height, delay) => {
       const worker = this.jobs.workers[this.jobs.total % this.numWorkers];
@@ -303,6 +318,10 @@ export class WebGLGifRecorder extends Recorder {
     }
 
     super.start();
+  }
+
+  cancel() {
+    return this.jobs.cancel();
   }
 
   stop() {
