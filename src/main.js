@@ -48,7 +48,7 @@ hide_buttons: ${hide_buttons}
 
   if (hide_buttons) {
     configureClickActions(gl, texture, animation, filename);
-    configureKeyboardActions(recorder, filename);
+    configureKeyboardActions(videoRecorder, filename);
   } else {
     configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename);
   }
