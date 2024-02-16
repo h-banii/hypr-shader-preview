@@ -111,7 +111,7 @@ class Recorder extends EventTarget {
 
   start() {
     console.log(
-      `[${new Date().toLocaleString()}] Started recording`
+      `Started recording`
     )
     this.reset();
     this.timestamp.start();
@@ -120,7 +120,7 @@ class Recorder extends EventTarget {
 
   stop() {
     console.log(
-      `[${new Date().toLocaleString()}] Stopped recording`
+      `Stopped recording`
     )
     this.isRecording = false;
     this.timestamp.stop();
@@ -202,7 +202,7 @@ export class CanvasRecorder extends Recorder {
 
   save(filename = 'hypr-shader-preview-video', type = 'video/mp4') { 
     console.log(
-`[${new Date().toLocaleString()}] Downloading recording:
+`Downloading recording:
 filename: ${filename}
 fps: ${this.fps}
 resolution: ${this.width} x ${this.height}
@@ -331,7 +331,7 @@ export class WebGLGifRecorder extends Recorder {
 
   async save(filename) {
     console.log(
-`[${new Date().toLocaleString()}] Downloading recording:
+`Downloading recording:
 filename: ${filename}
 fps: ${this.fps}
 frames: ${this.jobs.total}

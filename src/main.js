@@ -23,8 +23,8 @@ video_mime: ${video_mime}
 gif_fps: ${gif_fps}
 gif_colors: ${gif_colors}
 gif_workers: ${gif_workers}
-hide_buttons: ${hide_buttons}
-  `)
+hide_buttons: ${hide_buttons}`
+  )
 
   const gl = createContext(width, height);
 
@@ -39,7 +39,7 @@ hide_buttons: ${hide_buttons}
     draw(gl, fragSrc, texture, animation);
   } catch(e) {
     console.log(
-      `[${new Date().toLocaleString()}] Failed to load shader.`
+      `Failed to load shader.`
     );
   }
 
@@ -55,13 +55,72 @@ hide_buttons: ${hide_buttons}
 }
 
 function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename) {
-  const creditButtons = createElement({ classList: 'top right', children: [
+  const creditButtons = createElement({ classList: 'top right', style: 'width: 500px;', children: [
     createElement({
       type: 'button',
       innerText: ' h-banii/hypr-shader-preview',
+      style: `
+        display: block;
+        width: inherit;
+      `,
       onclick: function() {
         window.open('https://github.com/h-banii/hypr-shader-preview');
       }
+    }),
+    createElement({
+      classList: 'button',
+      style: `
+        display: block;
+        max-height: 300px;
+        position: relative;
+        padding-right: 40px;
+      `,
+      children: [
+        createElement({
+          style: `
+            display: block;
+            font-size: 12px;
+            max-height: inherit;
+            overflow-y: scroll;
+          `,
+          innerText: '',
+          setup: self => {
+            const transform = (msg) => `
+              <span style="color: #aaaaff">
+                ${msg[0]}
+              </span> <span>
+                ${msg.slice(1).join(' ').replace(/\n/g, '<br>')}
+              </span><br>
+            `;
+            self.innerHTML = Logger.messages.map(transform).join('<br>')
+            Logger.addEventListener('message', e => {
+              self.innerHTML = `${self.innerHTML}${transform(e.data)}`;
+              self.scrollTop = self.scrollHeight;
+              // self.innerText = Logger.messages.join('\n')
+            });
+          },
+        }),
+        createElement({
+          type: 'button',
+          innerText: '',
+          style: `
+            background: transparent;
+            position: absolute;
+            padding: 0 10px;
+            margin: 8px;
+            right: 0;
+            top: 0;
+          `,
+          setup: self => {
+            let toggle = false;
+            self.onclick = () => {
+              self.parentNode.style.maxHeight = toggle ? '200px' : '30px';
+              self.innerText = toggle ? '' : '';
+              toggle = !toggle;
+            }
+          }
+        })
+      ],
     }),
   ]});
 
@@ -78,10 +137,10 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
             return filename;
           })
           .then((filename) => console.log(
-            `[${new Date().toLocaleString()}] Loaded background image: ${filename}`
+            `Loaded background image: ${filename}`
           ))
           .catch((e) => console.log(
-            `[${new Date().toLocaleString()}] Failed to load background image: ${e}`
+            `Failed to load background image: ${e}`
           ))
       }
     }),
@@ -97,10 +156,10 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
             return filename;
           })
           .then((filename) => console.log(
-            `[${new Date().toLocaleString()}] Loaded fragment shader: ${filename}`
+            `Loaded fragment shader: ${filename}`
           ))
           .catch((e) => console.log(
-            `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+            `Failed to load fragment shader: ${e}`
           ))
       }
     }),
@@ -281,7 +340,7 @@ function configureClickActions(gl, texture, animation, filename) {
         draw(gl, src, texture, animation)
       })
       .catch((e) => console.log(
-        `[${new Date().toLocaleString()}] Failed to load fragment shader: ${e}`
+        `Failed to load fragment shader: ${e}`
       ))
   }, 500);
   gl.canvas.addEventListener('mouseup', e => clickAction.next())
