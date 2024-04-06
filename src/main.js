@@ -56,7 +56,7 @@ hide_buttons: ${hide_buttons}`
     draw(gl, fragSrc, texture, animation);
   } catch(e) {
     console.log(
-      `Failed to load shader.`
+      `Failed to load shader.`, e
     );
   }
 
