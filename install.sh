@@ -5,9 +5,9 @@ if [ -z "$1" ]; then
   exit
 fi
 
-HYPR_CONFIG=~/.config/hypr
-SHADERS=./src/public/shaders
+HYPR_SHADERS_DIR=~/.config/hypr/shaders
+LOCAL_SHADERS_DIR=./src/public/shaders
 
-mkdir -pv ${HYPR_CONFIG}/shaders
+mkdir -pv ${HYPR_SHADERS_DIR}
 
-cp -v "${SHADERS}/$1".frag ${HYPR_CONFIG}/shaders
+cp -v "${LOCAL_SHADERS_DIR}/$1".frag ${HYPR_SHADERS_DIR}
