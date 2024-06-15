@@ -145,6 +145,37 @@ OBS with a display/window source then apply the shaders on it. But that
 requires creating an OBS plugin and it feels kinda overkill compared to this
 simple web page that works inside a regular browser...
 
+# Scripts
+
+There are 2 scripts inside the scripts/ folder: `install.sh` and `apply.sh`
+
+## `install.sh`
+
+This moves the file `sakura.frag` from `./src/public/shaders` to
+`~/.config/hypr/shaders`
+```sh
+./scripts/install.sh sakura
+```
+
+## `apply.sh`
+
+This applies the `~/.config/hypr/shaders/sakura.frag` shader and automatically
+activates damage_tracking if needed (i.e. if it uses **time**).
+```sh
+./scripts/apply.sh on sakura
+```
+
+This turns off the shader and deactivates damage_tracking.
+```sh
+./scripts/apply.sh off
+```
+
+You can also give the path to the shader file.
+```sh
+./scripts/apply.sh on ~/.config/hypr/shaders/sakura.frag
+./scripts/apply.sh on ./src/public/shaders/sakura.frag
+```
+
 # Goals
 
 - [X] Compile and run Hyprland shaders
@@ -153,3 +184,4 @@ simple web page that works inside a regular browser...
 - [X] Show buttons on the screen
 - [X] Deploy to GitHub Pages
 - [X] Record gifs in the browser
+- [ ] uniform int wl_output
