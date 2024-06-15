@@ -7,7 +7,7 @@ HYPR_SHADERS_DIR=~/.config/hypr/shaders
 set -e
 
 state="$1"
-shader_name="$2"
+shader="$2"
 
 help() {
   echo "This script dynamically applies shaders to Hyprland using hyprctl"
@@ -16,9 +16,9 @@ help() {
 
 usage() {
   echo "Usage:" >&2
-  echo "  ./apply.sh on shader_name" >&2
+  echo "  ./apply.sh on shader" >&2
   echo "  ./apply.sh off" >&2
-  echo -e "(this assumes there's a shader_name.frag \
+  echo -e "(this assumes there's a shader.frag \
 file inside ~/.config/hypr/shaders)\n" >&2
 }
 
@@ -33,14 +33,15 @@ file inside ~/.config/hypr/shaders)\n" >&2
   && usage \
   && exit
 
-[ "$state" = "on" ] && [ -z "$shader_name" ] \
+[ "$state" = "on" ] && [ -z "$shader" ] \
   && help \
   && echo -e "Error: missing shader name\n" >&2 \
   && usage \
   && exit
 
-mkdir -pv ${HYPR_SHADERS_DIR}
-shader="${HYPR_SHADERS_DIR}/$shader_name".frag
+[[ "$shader" == *"/"* ]] \
+  && shader=$(realpath "${shader}") \
+  || shader="${HYPR_SHADERS_DIR}/$shader".frag
 
 check() {
   [ "$1" = "ok" ] && return 0 \
@@ -58,6 +59,11 @@ damage_tracking_is_active() {
 }
 
 check $(if [ "$state" = 'on' ]; then
+  if [ ! -f "$shader" ]; then
+    echo "shader '${shader}' not found" >&2
+    exit 1
+  fi
+
   if needs_damage_tracking; then
     hyprctl --batch "\
       keyword debug:damage_tracking 0 ;\
