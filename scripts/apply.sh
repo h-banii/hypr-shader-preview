@@ -1,7 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-# This script can be placed and executed from anywhere,
-# the only thing it assumes is that shaders are here:
 HYPR_SHADERS_DIR=~/.config/hypr/shaders
 
 set -e
@@ -10,34 +8,37 @@ state="$1"
 shader="$2"
 
 help() {
+  echo -e "h-shaders scripts v1.0\n"
   echo "This script dynamically applies shaders to Hyprland using hyprctl"
-  echo -e "It automatically switches damage_tracking if you script uses 'time'\n"
+  echo -e "It automatically switches damage_tracking if your script uses 'time'\n"
 }
 
 usage() {
   echo "Usage:" >&2
-  echo "  ./apply.sh on shader" >&2
+  echo "  ./apply.sh on sakura             \
+  (~/.config/hypr/shaders/sakura.frag)" >&2
+  echo "  ./apply.sh on ./path/sakura.frag \
+  (path to the shader file)" >&2
   echo "  ./apply.sh off" >&2
-  echo -e "(this assumes there's a shader.frag \
-file inside ~/.config/hypr/shaders)\n" >&2
 }
 
-[ "$1" = '--help' ] \
+error() {
+  help
+  echo -e "$1" >&2
+  usage
+  exit
+}
+
+[ "$1" = '--help' ] || [ "$1" = '--version' ] \
   && help \
   && usage \
   && exit
 
 [ -z "$state" ] \
-  && help \
-  && echo -e "\nError: missing state (on/off)\n" >&2 \
-  && usage \
-  && exit
+  && error "\nError: missing state (on/off)\n"
 
 [ "$state" = "on" ] && [ -z "$shader" ] \
-  && help \
-  && echo -e "Error: missing shader name\n" >&2 \
-  && usage \
-  && exit
+  && error "Error: missing shader name\n"
 
 [[ "$shader" == *"/"* ]] \
   && shader=$(realpath "${shader}") \
