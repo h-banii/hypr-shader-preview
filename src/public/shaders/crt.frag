@@ -102,7 +102,7 @@ vec4 crt(vec4 pixel) {
     v_texcoord.y + CRT_CURVE * uv.y * uv.x * uv.x
   );
 
-  vec2 dim = vec2(CRT_WIDTH., CRT_HEIGHT.) * uv;
+  vec2 dim = vec2(CRT_WIDTH, CRT_HEIGHT) * uv;
   float scanline = mod(dim.y, 7.);
 
   if (scanline < 1.)
