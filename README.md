@@ -185,4 +185,5 @@ You can also give the path to the shader file.
 - [X] Deploy to GitHub Pages
 - [X] Record gifs in the browser
 - [X] Resize canvas when window resizes
+- [ ] Allow video as background
 - [ ] uniform int wl_output
