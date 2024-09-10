@@ -429,8 +429,8 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 queryParameters(main, {
   "shader" : 'default.frag',
   "image"  : 'default.png',
-  "width"  : window.innerWidth,
-  "height" : window.innerHeight,
+  "width"  : null,
+  "height" : null,
   "video_fps" : 30,
   "video_mbps": 26,
   "video_mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,

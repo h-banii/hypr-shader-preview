@@ -1,11 +1,6 @@
 export function createContext(width, height) {
   const canvas = document.createElement('canvas');
 
-  canvas.width = width;
-  canvas.height = height;
-
-  document.body.appendChild(canvas);
-
   const gl = canvas.getContext("webgl2", {
     preserveDrawingBuffer: true // this allows us to save it to an image
   });
@@ -15,8 +10,21 @@ export function createContext(width, height) {
     return;
   }
 
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+  const resize = (width, height) => {
+    canvas.width = width || window.innerWidth;
+    canvas.height = height || window.innerHeight;
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  }; resize(width, height);
+
+  if (!width || !height) {
+    addEventListener("resize", event =>
+      resize(width, height)
+    );
+  }
+
+  document.body.appendChild(canvas);
 
   return gl;
 }
