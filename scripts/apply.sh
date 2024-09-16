@@ -74,7 +74,7 @@ check $(if [ "$state" = 'on' ]; then
   fi
 else
   # OBS.: for some reason it gives an error if I try to batch it
-  hyprctl keyword decoration:screen_shader ""
+  hyprctl keyword decoration:screen_shader " "
   if damage_tracking_is_active; then
     hyprctl keyword debug:damage_tracking 2
   fi
