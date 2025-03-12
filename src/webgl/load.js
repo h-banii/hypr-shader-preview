@@ -1,4 +1,4 @@
-export function loadShader(url) {
+export async function loadShader(url) {
   return fetch(url)
     .then(response => response.text())
 }
