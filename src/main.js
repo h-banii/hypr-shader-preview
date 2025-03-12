@@ -222,7 +222,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
       recorder.addEventListener('recording', e => {
         self.innerText = e.detail ? '◉ stop ' : '◎ record ' + type;
       })
-      recorder.addEventListener('reset', e => {
+      recorder.addEventListener('reset', () => {
         self.style.display = '';
       })
     },
@@ -350,14 +350,14 @@ function configureClickActions(gl, texture, animation, filename) {
   }, () => {
     askForFile('frag')
       .then(readFileAsText)
-      .then(([filename, src]) => {
+      .then(([_filename, src]) => {
         draw(gl, src, texture, animation)
       })
       .catch((e) => console.log(
         `Failed to load fragment shader: ${e}`
       ))
   }, 500);
-  gl.canvas.addEventListener('mouseup', e => clickAction.next())
+  gl.canvas.addEventListener('mouseup', () => clickAction.next())
 }
 
 function draw(gl, fragSrc, texture, animation) {

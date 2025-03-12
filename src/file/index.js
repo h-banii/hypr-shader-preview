@@ -306,7 +306,7 @@ export class WebGLGifRecorder extends Recorder {
       });
     }).catch(() => console.log('gif encoding has been cancelled.'));
 
-    this.jobs.add = (data, width, height, delay) => {
+    this.jobs.add = (data, _width, _height, _delay) => {
       const worker = this.jobs.workers[this.jobs.total % this.numWorkers];
 
       worker.postMessage([data, this.jobs.total++], [ data.buffer ])

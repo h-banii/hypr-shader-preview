@@ -19,7 +19,7 @@ export function createContext(width, height) {
   }; resize(width, height);
 
   if (!width || !height) {
-    addEventListener("resize", event =>
+    addEventListener("resize", _event =>
       resize(width, height)
     );
   }
