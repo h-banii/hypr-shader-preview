@@ -407,7 +407,7 @@ function configureClickActions(program, filename) {
         `Failed to load fragment shader: ${e}`
       ))
   }, 500);
-  gl.canvas.addEventListener('mouseup', () => clickAction.next())
+  program.gl.canvas.addEventListener('mouseup', () => clickAction.next())
 }
 
 function initSquareBuffer(gl, program) {
