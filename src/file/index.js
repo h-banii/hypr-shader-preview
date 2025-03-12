@@ -259,7 +259,7 @@ export class WebGLGifRecorder extends Recorder {
       done: 0,
       frames: [],
       final: null,
-      promise: null,
+      promise: Promise.resolve([]),
       cancel: () => {},
       cache: null,
       workers: null,
