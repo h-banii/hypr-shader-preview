@@ -11,6 +11,6 @@
   "author": "h-banii",
   "license": "MIT",
   "devDependencies": {
-    "vite": "^5.2.8"
+    "vite": "6.2.1"
   }
 }
