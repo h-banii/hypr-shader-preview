@@ -44,8 +44,6 @@ need to modify your hyprland shaders, they're likely already compatible.
 varying vec2 v_texcoord
 uniform sampler2D tex
 uniform float time
-
-// Not supported, but planning to add
 uniform int wl_output
 ```
 
@@ -185,5 +183,5 @@ You can also give the path to the shader file.
 - [X] Deploy to GitHub Pages
 - [X] Record gifs in the browser
 - [X] Resize canvas when window resizes
+- [X] uniform int wl_output
 - [ ] Allow video as background
-- [ ] uniform int wl_output
