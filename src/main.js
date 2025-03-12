@@ -23,6 +23,57 @@ Logger.messages = [];
   };
 })();
 
+class Program {
+  constructor(gl, fragSrc, texture) {
+    this.gl = gl;
+
+    this.fragSrc = fragSrc;
+    this.texture = texture;
+
+    this.animation = new Animation;
+  }
+
+  setFragSrc(src)  {
+    this.fragSrc = src;
+  }
+
+  async loadTextureAsync(url)  {
+    this.texture = await loadTexture(this.gl, url);
+  }
+
+  draw() {
+    const gl = this.gl;
+    const fragSrc = this.fragSrc;
+    const texture = this.texture;
+    const animation = this.animation;
+
+    animation.stop();
+
+    const vertSrc = fragSrc.includes('version 300') ? vertex3Src : vertexSrc;
+    const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
+    const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
+    const program = createProgram(gl, vertShader, fragShader);
+
+    gl.useProgram(program);
+
+    initSquareBuffer(gl, program);
+    initTextureSampler(gl, program, texture);
+
+    const uTimeLocation = gl.getUniformLocation(program, "time");
+    if (uTimeLocation) {
+      animation.render = (time) => {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform1f(uTimeLocation, time);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+      };
+
+      animation.start();
+    } else {
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    }
+  }
+}
+
 async function main({
   shader, image, width, height,
   video_fps, video_mbps, video_mime,
@@ -42,36 +93,36 @@ gif_colors: ${gif_colors}
 gif_workers: ${gif_workers}
 hide_buttons: ${hide_buttons}`
   )
-
   const gl = createContext(width, height);
 
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const videoRecorder = new CanvasRecorder(gl.canvas, video_fps, video_mbps, video_mime);
-  const gifRecorder = new WebGLGifRecorder(gl, gif_fps, gif_colors, gif_workers);
-  const animation = new Animation;
+  const program = new Program(gl, fragSrc, texture);
 
   try {
-    draw(gl, fragSrc, texture, animation);
+    program.draw();
   } catch(e) {
     console.log(
       `Failed to load shader.`, e
     );
   }
 
+  const videoRecorder = new CanvasRecorder(gl.canvas, video_fps, video_mbps, video_mime);
+  const gifRecorder = new WebGLGifRecorder(gl, gif_fps, gif_colors, gif_workers);
+
   const filename = () =>
     generateFilename('hypr-shader-preview', shader, image);
 
   if (hide_buttons) {
-    configureClickActions(gl, texture, animation, filename);
+    configureClickActions(program, filename);
     configureKeyboardActions(videoRecorder, filename);
   } else {
-    configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename);
+    configureButtonActions(program, gifRecorder, videoRecorder, filename);
   }
 }
 
-function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, videoRecorder, filename) {
+function configureButtonActions(program, gifRecorder, videoRecorder, filename) {
   const creditButtons = createElement({ classList: 'bottom right', style: 'width: 550px;', children: [
     createElement({
       classList: 'button',
@@ -148,13 +199,8 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
         askForFile()
           .then(readFileAsDataURL)
           .then(async ([filename, url]) => {
-            const newTexture = await loadTexture(gl, url);
-            draw(gl, fragSrc, newTexture, animation)
-            return [filename, newTexture];
-          })
-          .then(([filename, newTexture]) => {
             console.log(`Loaded background image: ${filename}`)
-            return texture = newTexture;
+            return program.loadTextureAsync(url).then(() => program.draw());
           })
           .catch((e) => console.log(`Failed to load background image: ${e}`))
       }
@@ -166,13 +212,9 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
         askForFile('frag')
           .then(readFileAsText)
           .then(([filename, src]) => {
-            const newFragSrc = src;
-            draw(gl, newFragSrc, texture, animation)
-            return [filename, newFragSrc];
-          })
-          .then(([filename, newFragSrc]) => {
+            program.setFragSrc(src);
+            program.draw();
             console.log(`Loaded fragment shader: ${filename}`)
-            return fragSrc = newFragSrc;
           })
           .catch((e) => console.log(`Failed to load fragment shader:\n${e}`))
       }
@@ -184,7 +226,7 @@ function configureButtonActions(gl, fragSrc, texture, animation, gifRecorder, vi
       type: 'button',
       innerText: ' screenshot',
       onclick: function() {
-        screenshotCanvas(gl.canvas, filename());
+        screenshotCanvas(program.gl.canvas, filename());
       }
     }),
   ]});
@@ -344,48 +386,21 @@ function configureKeyboardActions(recorder, filename) {
   })
 }
 
-function configureClickActions(gl, texture, animation, filename) {
+function configureClickActions(program, filename) {
   const clickAction = doubleClick(() => {
-    screenshotCanvas(gl.canvas, filename());
+    screenshotCanvas(program.gl.canvas, filename());
   }, () => {
     askForFile('frag')
       .then(readFileAsText)
       .then(([_filename, src]) => {
-        draw(gl, src, texture, animation)
+        program.setFragSrc(src);
+        program.draw();
       })
       .catch((e) => console.log(
         `Failed to load fragment shader: ${e}`
       ))
   }, 500);
   gl.canvas.addEventListener('mouseup', () => clickAction.next())
-}
-
-function draw(gl, fragSrc, texture, animation) {
-  animation.stop();
-
-  const vertSrc = fragSrc.includes('version 300') ? vertex3Src : vertexSrc;
-  const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
-  const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
-  const program = createProgram(gl, vertShader, fragShader);
-
-  gl.useProgram(program);
-
-  initSquareBuffer(gl, program);
-  initTextureSampler(gl, program, texture);
-
-  if (fragSrc.includes('time')) {
-    const uTimeLocation = gl.getUniformLocation(program, "time");
-
-    animation.render = (time) => {
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform1f(uTimeLocation, time);
-      gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    };
-
-    animation.start();
-  } else {
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-  }
 }
 
 function initSquareBuffer(gl, program) {
