@@ -24,13 +24,15 @@ Logger.messages = [];
 })();
 
 class Program {
-  constructor(gl, fragSrc, texture) {
+  constructor(gl, fragSrc, texture, wl_output = 0) {
     this.gl = gl;
 
     this.fragSrc = fragSrc;
     this.texture = texture;
 
     this.animation = new Animation;
+
+    this.wl_output = wl_output;
   }
 
   setFragSrc(src)  {
@@ -59,6 +61,10 @@ class Program {
     initSquareBuffer(gl, program);
     initTextureSampler(gl, program, texture);
 
+    const uWlOutputLocation = gl.getUniformLocation(program, "wl_output");
+    if (uWlOutputLocation)
+      gl.uniform1i(uWlOutputLocation, this.wl_output);
+
     const uTimeLocation = gl.getUniformLocation(program, "time");
     if (uTimeLocation) {
       animation.render = (time) => {
@@ -75,7 +81,7 @@ class Program {
 }
 
 async function main({
-  shader, image, width, height,
+  shader, image, width, height, wl_output,
   video_fps, video_mbps, video_mime,
   gif_fps, gif_colors, gif_workers,
   hide_buttons
@@ -85,6 +91,7 @@ shader: ${shader}
 image: ${image}
 width: ${width}
 height: ${height}
+wl_output: ${wl_output}
 video_fps: ${video_fps}
 video_mbps: ${video_mbps}
 video_mime: ${video_mime}
@@ -98,7 +105,7 @@ hide_buttons: ${hide_buttons}`
   const fragSrc = await loadShader(`./shaders/${shader}`)
   const texture = await loadTexture(gl, `./images/${image}`);
 
-  const program = new Program(gl, fragSrc, texture);
+  const program = new Program(gl, fragSrc, texture, wl_output);
 
   try {
     program.draw();
@@ -446,6 +453,7 @@ queryParameters(main, {
   "image"  : 'default.png',
   "width"  : null,
   "height" : null,
+  "wl_output": 0,
   "video_fps" : 30,
   "video_mbps": 26,
   "video_mime": `video/webm; codecs="${isFirefox ? 'vp8' : 'vp9'}"`,
