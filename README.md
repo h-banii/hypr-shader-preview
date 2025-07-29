@@ -114,11 +114,9 @@ Here's an example using some of them:
 
 ## Version 3.00
 
-WebGL supports version 3.00 of the language, using the `#version 300 es`
-directive, and so does this project. But I realized that Hyprland doesn't seem
-to support it, or maybe it needs some modification.
+<s>This is a not very useful feature at the moment, but it's there.</s>
 
-So... this is a not very useful feature at the moment, but it's there.
+Now Hyprland uses `GLSL 300 es` shaders, so this is finally useful!
 
 # Limitations
 
