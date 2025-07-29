@@ -1,8 +1,13 @@
+#version 300 es
+
+// made by h-banii for Hyprland and WebGL
+
 precision lowp float;
 
+out vec4 fragColor;
+in vec2 v_texcoord;
 uniform float time;
 uniform sampler2D tex;
-varying vec2 v_texcoord;
 
 
 #ifndef EASING
@@ -106,7 +111,7 @@ vec4 crt(vec4 pixel) {
   float scanline = mod(dim.y, 7.);
 
   if (scanline < 1.)
-    return texture2D(tex, uv);
+    return texture(tex, uv);
 
   vec3 rgb_factor = vec3(CRT_RGB);
 
@@ -131,7 +136,7 @@ vec4 crt(vec4 pixel) {
   float fract_time = easeInOutCubic(abs(2. * (fract(5. * time) - 0.5)));
   if (even_scanline)
     fract_time = 1. - fract_time;
-  pixel = texture2D(tex, uv + vec2(CRT_INTERLACING * fract_time, 0));
+  pixel = texture(tex, uv + vec2(CRT_INTERLACING * fract_time, 0));
 
   return vec4(
     pixel.rgb * (rgb_factor + CRT_OUTLINE * outline), pixel.w
@@ -220,9 +225,9 @@ vec4 saturate(vec4 pixel) {
 
 void main() {
   #ifndef BASE_SHADER
-  vec4 color = texture2D(tex, v_texcoord);
+  vec4 color = texture(tex, v_texcoord);
   #else
   vec4 color = vec4(0.);
   #endif
-  gl_FragColor = strob(noise(easing(saturate(crt(color)))));
+  fragColor = strob(noise(easing(saturate(crt(color)))));
 }

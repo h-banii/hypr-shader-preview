@@ -1,8 +1,11 @@
+#version 300 es
+
 // made by h-banii for Hyprland and WebGL
 
 precision mediump float;
 
-varying vec2 v_texcoord;
+out vec4 fragColor;
+in vec2 v_texcoord;
 uniform sampler2D tex;
 uniform float time;
 
@@ -66,7 +69,7 @@ vec3 screen_blend_mode(vec3 top, vec3 bottom) {
 
 void main() {
   vec2 uv = v_texcoord;
-  vec4 pixel = texture2D(tex, v_texcoord);
+  vec4 pixel = texture(tex, v_texcoord);
   vec3 canvas = vec3(0.0, 0.0, 0.0);
 
   for (float i = 0.0; i < SAKURA_LAYERS; i++) {
@@ -92,5 +95,5 @@ void main() {
     pixel.w = max(pixel.w, petals);
   }
 
-  gl_FragColor = vec4(screen_blend_mode(canvas * COLOR * OPACITY, pixel.xyz), pixel.w);
+  fragColor = vec4(screen_blend_mode(canvas * COLOR * OPACITY, pixel.xyz), pixel.w);
 }
