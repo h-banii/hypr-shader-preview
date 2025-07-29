@@ -40,8 +40,7 @@ It uses the same variable names that Hyprland expects, so you *probably* don't
 need to modify your hyprland shaders, they're likely already compatible.
 
 ```glsl
-// Supported
-varying vec2 v_texcoord
+in vec2 v_texcoord
 uniform sampler2D tex
 uniform float time
 uniform int wl_output
