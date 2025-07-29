@@ -4,7 +4,6 @@ import { askForFile, screenshotCanvas, CanvasRecorder, WebGLGifRecorder, readFil
 import { doubleClick, queryParameters, generateFilename, createElement, createInput } from './utils';
 
 import vertexSrc from '/shaders/default.vert?url&raw';
-import vertex3Src from '/shaders/default3.vert?url&raw';
 
 const Logger = new EventTarget;
 Logger.messages = [];
@@ -51,7 +50,7 @@ class Program {
 
     animation.stop();
 
-    const vertSrc = fragSrc.includes('version 300') ? vertex3Src : vertexSrc;
+    const vertSrc = vertexSrc;
     const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSrc);
     const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
     const program = createProgram(gl, vertShader, fragShader);
